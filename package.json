@@ -1,0 +1,29 @@
+{
+  "name": "typesafe-electron-ipc",
+  "version": "0.0.1",
+  "description": "typesafe ipc for electron",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [
+    "electron",
+    "ipc",
+    "renderer"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^24.4.0",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4"
+  },
+  "peerDependencies": {
+    "electron": "*"
+  }
+}
