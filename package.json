@@ -1,6 +1,8 @@
 {
   "name": "typesafe-electron-ipc",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "author": "subframe7536",
+  "license": "MIT",
   "description": "typesafe ipc for electron",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -8,16 +10,15 @@
   "files": [
     "dist"
   ],
-  "scripts": {
-    "build": "tsup"
-  },
   "keywords": [
     "electron",
     "ipc",
-    "renderer"
+    "renderer",
+    "typesafe"
   ],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "build": "tsup"
+  },
   "devDependencies": {
     "electron": "^24.4.0",
     "tsup": "^6.7.0",
@@ -25,5 +26,8 @@
   },
   "peerDependencies": {
     "electron": "*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
