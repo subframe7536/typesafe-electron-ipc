@@ -103,7 +103,7 @@ export function generateMainIpcFn<T extends SetupObject>(setup: T): TypesafeMain
         main[k] = (win: BrowserWindow, data: any) => {
           win.webContents.send(c, data)
         }
-      } else if (['handle', 'on', 'once'].includes(m)) {
+      } else if (['handle', 'handleOnce', 'on', 'once'].includes(m)) {
         main[k] = ipcMain[m].bind(ipcMain, c)
       } else {
         throw new TypeError(`invalid main function string: ${m}, valid string is 'handle', 'on' or 'once'`)

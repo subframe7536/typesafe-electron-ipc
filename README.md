@@ -7,9 +7,26 @@ auto generate typesafe ipc functions for electron
 #### in shared
 
 ```typescript
+/**
+ * for type auto completion,
+ * main/renderer in *IpcFn is cast to function,
+ * but the real type is string
+ */
 const state = {
+  /**
+   * renderer -> main
+   * ipcRenderer.invoke & ipcMain.handle
+   */
   msg: fetchIpcFn<string, string>('msg'),
+  /**
+   * renderer -> main
+   * ipcRenderer.send & ipcMain.on
+   */
   front: rendererSendIpcFn<{ test: number }>('front'),
+  /**
+   * main -> renderer
+   * ipcRenderer.on & BrowserWindow.webContents.send
+   */
   back: mainSendIpcFn<boolean>('back'),
 }
 ```
