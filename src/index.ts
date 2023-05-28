@@ -63,8 +63,18 @@ export function generateRendererIpcFn<T extends SetupObject>(setup: T): Typesafe
   const renderer = {} as any
   const channels = {} as any
   for (const [k, v] of Object.entries(setup)) {
-    const r = v.renderer as unknown as string
-    renderer[k] = ipcRenderer[r].bind(ipcRenderer, v.channel)
+    const r = v.renderer as unknown
+    if (typeof r === 'string') {
+      if (['invoke', 'send', 'on', 'once'].includes(r)) {
+        renderer[k] = ipcRenderer[r].bind(ipcRenderer, v.channel)
+      } else {
+        throw new TypeError(`invalid renderer function string: ${r}, valid string is 'invoke', 'send', 'on' or 'once'`)
+      }
+    } else if (typeof r === 'function') {
+      renderer[k] = r
+    } else {
+      throw new TypeError(`invalid renderer function: ${r}`)
+    }
     channels[k] = v.channel
   }
   return {
@@ -79,13 +89,23 @@ export function generateMainIpcFn<T extends SetupObject>(setup: T): TypesafeMain
   const main = {} as any
   const channels = {} as any
   for (const [k, v] of Object.entries(setup)) {
-    const m = v.main as unknown as string
+    const m = v.main as unknown
     const c = v.channel
-    main[k] = m === 'send'
-      ? (win: BrowserWindow, data: any) => {
+    if (typeof m === 'string') {
+      if (m === 'send') {
+        main[k] = (win: BrowserWindow, data: any) => {
           win.webContents.send(c, data)
         }
-      : ipcMain[m].bind(ipcMain, c)
+      } else if (['handle', 'on', 'once'].includes(m)) {
+        main[k] = ipcMain[m].bind(ipcMain, c)
+      } else {
+        throw new TypeError(`invalid main function string: ${m}, valid string is 'handle', 'on' or 'once'`)
+      }
+    } else if (typeof m === 'function') {
+      main[k] = m
+    } else {
+      throw new TypeError(`invalid main function: ${m}`)
+    }
     channels[k] = c
   }
   return {
