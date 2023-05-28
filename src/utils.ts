@@ -1,5 +1,4 @@
-import { ipcRenderer, ipcMain, BrowserWindow } from 'electron'
-import type { RendererInvokeFn, MainHandleFn, Promisable, RendererOnFn, MainSendFn, RendererSendFn, MainOnFn, IpcFn } from './types'
+import type { IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn } from './types'
 
 export function fetchIpcFn<Data, Return = Data, Channel extends string = string>(c: Channel): IpcFn<
   RendererInvokeFn<Data, Promise<Return>>,
@@ -8,10 +7,11 @@ export function fetchIpcFn<Data, Return = Data, Channel extends string = string>
 > {
   return {
     channel: c,
-    renderer: ipcRenderer?.invoke.bind(ipcRenderer, c),
-    main: ipcMain?.handle.bind(ipcMain, c),
+    renderer: 'invoke' as any,
+    main: 'handle' as any,
   }
 }
+
 export function fetchOnceIpcFn<Data, Return = Data, Channel extends string = string>(c: Channel): IpcFn<
   RendererInvokeFn<Data, Promise<Return>>,
   MainHandleFn<Data, Promisable<Return>>,
@@ -19,8 +19,8 @@ export function fetchOnceIpcFn<Data, Return = Data, Channel extends string = str
 > {
   return {
     channel: c,
-    renderer: ipcRenderer?.invoke.bind(ipcRenderer, c),
-    main: ipcMain?.handleOnce.bind(ipcMain, c),
+    renderer: 'invoke' as any,
+    main: 'handleOnce' as any,
   }
 }
 export function mainSendIpcFn<Data, Channel extends string = string>(c: Channel): IpcFn<
@@ -30,11 +30,8 @@ export function mainSendIpcFn<Data, Channel extends string = string>(c: Channel)
 > {
   return {
     channel: c,
-    main: (win: BrowserWindow, data: any) => {
-      console.log(win.id)
-      win.webContents.send(c, data)
-    },
-    renderer: ipcRenderer?.on.bind(ipcRenderer, c),
+    main: 'send' as any,
+    renderer: 'on' as any,
   }
 }
 export function mainSendOnceIpcFn<Data, Channel extends string = string>(c: Channel): IpcFn<
@@ -44,10 +41,8 @@ export function mainSendOnceIpcFn<Data, Channel extends string = string>(c: Chan
 > {
   return {
     channel: c,
-    main: (win: BrowserWindow, data: any) => {
-      win.webContents.send(c, data)
-    },
-    renderer: ipcRenderer?.once.bind(ipcRenderer, c),
+    main: 'send' as any,
+    renderer: 'once' as any,
   }
 }
 export function rendererSendIpcFn<Data, Channel extends string = string>(c: Channel): IpcFn<
@@ -57,8 +52,8 @@ export function rendererSendIpcFn<Data, Channel extends string = string>(c: Chan
 > {
   return {
     channel: c,
-    main: ipcMain?.on.bind(ipcMain, c),
-    renderer: ipcRenderer?.send.bind(ipcRenderer, c),
+    main: 'on' as any,
+    renderer: 'send' as any,
   }
 }
 export function rendererSendOnceIpcFn<Data, Channel extends string = string>(c: Channel): IpcFn<
@@ -68,7 +63,7 @@ export function rendererSendOnceIpcFn<Data, Channel extends string = string>(c: 
 > {
   return {
     channel: c,
-    main: ipcMain?.once.bind(ipcMain, c),
-    renderer: ipcRenderer?.send.bind(ipcRenderer, c),
+    main: 'once' as any,
+    renderer: 'send' as any,
   }
 }

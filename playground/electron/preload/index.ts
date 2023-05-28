@@ -1,4 +1,5 @@
-import { ipcRenderer } from 'electron'
+import { generateTypesafeIpc } from 'typesafe-electron-ipc'
+import { state } from './ipc'
 
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
@@ -34,7 +35,7 @@ const safeDOM = {
  * https://matejkustec.github.io/SpinThatShit
  */
 function useLoading() {
-  const className = `loaders-css__square-spin`
+  const className = 'loaders-css__square-spin'
   const styleContent = `
 @keyframes square-spin {
   25% { transform: perspective(100px) rotateX(180deg) rotateY(0); }
@@ -93,4 +94,6 @@ window.onmessage = (ev) => {
 
 setTimeout(removeLoading, 4999)
 
-export { renderer } from './ipc'
+const { renderer, channels, clearListeners } = generateTypesafeIpc(state, 'renderer')
+
+export { renderer, channels, clearListeners }

@@ -1,4 +1,5 @@
-import type { IpcMain, IpcRenderer, BrowserWindow } from "electron";
+import type { BrowserWindow, IpcMain, IpcRenderer } from 'electron'
+
 export type Promisable<T> = T | Promise<T>
 export type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_: any, data: Data) => CallbackReturn) => Return
 
@@ -28,12 +29,18 @@ export type IpcFn<T, K, C extends string = string> = {
 
 export type SetupObject = Record<string, IpcFn<RendererIpcFn, MainIpcFn>>
 
-export type TypesafeIpc<T extends SetupObject> = {
-  main: {
-    [K in keyof T]: T[K]['main']
-  }
+export type TypesafeRendererIpc<T extends SetupObject> = {
   renderer: {
     [K in keyof T]: T[K]['renderer']
+  }
+  channels: {
+    [K in keyof T]: T[K]['channel']
+  }
+  clearListeners: (channel: T[keyof T]['channel']) => void
+}
+export type TypesafeMainIpc<T extends SetupObject> = {
+  main: {
+    [K in keyof T]: T[K]['main']
   }
   channels: {
     [K in keyof T]: T[K]['channel']

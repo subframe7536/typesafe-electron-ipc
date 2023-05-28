@@ -1,10 +1,10 @@
 import { rmSync } from 'node:fs'
-import { join } from "node:path";
+import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
+import { preload, renderer } from 'unplugin-auto-expose'
 import pkg from './package.json'
-import { preload, renderer } from "unplugin-auto-expose";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -58,7 +58,7 @@ export default defineConfig(({ command }) => {
               },
             },
           },
-        }
+        },
       ]),
     ],
     server: process.env.VSCODE_DEBUG && (() => {
@@ -71,4 +71,3 @@ export default defineConfig(({ command }) => {
     clearScreen: false,
   }
 })
-
