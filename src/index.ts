@@ -5,29 +5,31 @@ import type { SetupObject, TypesafeMainIpc, TypesafeRendererIpc } from './types'
 /**
  * Returns a typesafe IPC object based on the provided setup object.
  * The returned object contains:
- * - typed functions for the main
- * - typed functions for the renderer
- * - all channels
- * - clearListeners method to remove all listeners for a given channel.
  *
  * @example
- * #### preload.ts
-
+ *
+ * #### in shared
+ *
  * ```typescript
  * const state = {
  *   msg: fetchIpcFn<string, string>('msg'),
  *   front: rendererSendIpcFn<{ test: number }>('front'),
  *   back: mainSendIpcFn<boolean>('back'),
  * }
- * // exposed by contextBridge.exposeInMainWorld
+ * ```
+ *
+ * #### in preload
+ *
+ * ```typescript
  * const {
  *   renderer,
  *   clearListeners,
  *   channels
  * } = generateTypesafeIpc(state, 'renderer')
+ * contextBridge.exposeInMainWorld('renderer', renderer)
  * ```
  *
- * #### main.ts
+ * #### in main
  *
  * ```typescript
  * const {
@@ -35,23 +37,28 @@ import type { SetupObject, TypesafeMainIpc, TypesafeRendererIpc } from './types'
  *   clearListeners,
  *   channels
  * } = generateTypesafeIpc(state, 'main')
- * main.msg((_, data) => {
+ * main.msg((_, data) => { // data: string
  *   console.log(data)
  *   console.log(channels)
  *   return 'return from main'
  * })
  * ```
  *
- * #### renderer.ts
+ * #### in renderer
  *
  * ```typescript
  * export async function fetch() {
- *   console.log(await renderer.msg('fetch from renderer'))
+ *   const msg = await window.renderer.msg('fetch from renderer')
+ *   console.log(msg) // msg: string
  * }
  * ```
  *
- * @param {T extends SetupObject} setup - the setup object to generate the IPC object from
- * @return {TypesafeIpc<T>} the generated typesafe IPC object
+ * @param setup - the setup object to generate the IPC functions
+ * @param process - the process to generate the IPC functions
+ * @return the generated typesafe IPC object, includes:
+ * - typed functions for the main or renderer
+ * - all channels
+ * - clearListeners method to remove all listeners for a given channel.
  */
 export function generateTypesafeIpc<T extends SetupObject>(setup: T, process: 'renderer'): TypesafeRendererIpc<T>
 export function generateTypesafeIpc<T extends SetupObject>(setup: T, process: 'main'): TypesafeMainIpc<T>
