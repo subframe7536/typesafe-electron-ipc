@@ -6,25 +6,28 @@ auto generate typesafe ipc functions for electron
 
 #### preload.ts
 
-expose by contextBridge.exposeInMainWorld
-
 ```typescript
 const state = {
   msg: fetchIpcFn<string, string>('msg'),
   front: rendererSendIpcFn<{ test: number }>('front'),
   back: mainSendIpcFn<boolean>('back'),
 }
-export const {
-  main,
+// exposed by contextBridge.exposeInMainWorld
+const {
   renderer,
   clearListeners,
   channels
-} = generateTypesafeIpc(state)
+} = generateTypesafeIpc(state, 'renderer')
 ```
 
 #### main.ts
 
 ```typescript
+const {
+  main,
+  clearListeners,
+  channels
+} = generateTypesafeIpc(state, 'main')
 main.msg((_, data) => {
   console.log(data)
   console.log(channels)
@@ -42,4 +45,4 @@ export async function fetch() {
 
 ### example
 
-see [playground](./playground)
+see in [playground](./playground)

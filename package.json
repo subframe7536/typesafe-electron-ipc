@@ -17,10 +17,13 @@
     "typesafe"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "dev": "tsup && cd playground && pnpm i -f && pnpm dev"
   },
   "devDependencies": {
+    "@subframe7536/eslint-config": "^0.1.9",
     "electron": "^24.4.0",
+    "eslint": "^8.41.0",
     "tsup": "^6.7.0",
     "typescript": "^5.0.4"
   },
