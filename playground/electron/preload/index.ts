@@ -1,5 +1,5 @@
-import { generateTypesafeIpc } from 'typesafe-electron-ipc'
-import { state } from './ipc'
+import { generateTypesafeIpcModule } from 'typesafe-electron-ipc'
+import { ipcModules } from './ipc'
 
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
@@ -94,6 +94,7 @@ window.onmessage = (ev) => {
 
 setTimeout(removeLoading, 4999)
 
-const { renderer, channels, clearListeners } = generateTypesafeIpc(state, 'renderer')
+// const { renderer, channels, clearListeners } = generateTypesafeIpc(state, 'renderer')
+const { renderer, channels, clearListeners } = generateTypesafeIpcModule(ipcModules, 'renderer')
 
 export { renderer, channels, clearListeners }

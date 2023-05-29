@@ -1,88 +1,51 @@
 import type { BrowserWindow } from 'electron'
 import { ipcMain, ipcRenderer } from 'electron'
-import type { SetupObject, TypesafeMainIpc, TypesafeRendererIpc } from './types'
+import type { SetupItem, SetupModule, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
 
-/**
- * Returns a typesafe IPC object based on the provided setup object.
- * The returned object contains:
- *
- * @example
- *
- * #### in shared
- *
- * ```typescript
- * const state = {
- *   msg: fetchIpcFn<string, string>('msg'),
- *   front: rendererSendIpcFn<{ test: number }>('front'),
- *   back: mainSendIpcFn<boolean>('back'),
- * }
- * ```
- *
- * #### in preload
- *
- * ```typescript
- * const {
- *   renderer,
- *   clearListeners,
- *   channels
- * } = generateTypesafeIpc(state, 'renderer')
- * contextBridge.exposeInMainWorld('renderer', renderer)
- * ```
- *
- * #### in main
- *
- * ```typescript
- * const {
- *   main,
- *   clearListeners,
- *   channels
- * } = generateTypesafeIpc(state, 'main')
- * main.msg((_, data) => { // data: string
- *   console.log(data)
- *   console.log(channels)
- *   return 'return from main'
- * })
- * ```
- *
- * #### in renderer
- *
- * ```typescript
- * export async function fetch() {
- *   const msg = await window.renderer.msg('fetch from renderer')
- *   console.log(msg) // msg: string
- * }
- * ```
- *
- * @param setup - the setup object to generate the IPC functions
- * @param process - the process to generate the IPC functions
- * @return the generated typesafe IPC object, includes:
- * - typed functions for the main or renderer
- * - all channels
- * - clearListeners method to remove all listeners for a given channel.
- */
-export function generateTypesafeIpc<T extends SetupObject>(setup: T, process: 'renderer'): TypesafeRendererIpc<T>
-export function generateTypesafeIpc<T extends SetupObject>(setup: T, process: 'main'): TypesafeMainIpc<T>
-export function generateTypesafeIpc<T extends SetupObject>(setup: T, process: 'renderer' | 'main'): TypesafeRendererIpc<T> | TypesafeMainIpc<T> {
-  return process === 'renderer' ? generateRendererIpcFn(setup) : generateMainIpcFn(setup)
+function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'renderer'): TypesafeIpcRenderer<T>
+function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'main'): TypesafeIpcMain<T>
+function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'renderer' | 'main') {
+  const fn = process === 'renderer'
+    ? generateTypesafeIpcRenderer
+    : generateTypesafeIpcMain
+  return fn(setupRecord)
 }
 
-export function generateRendererIpcFn<T extends SetupObject>(setup: T): TypesafeRendererIpc<T> {
-  const renderer = {} as any
-  const channels = {} as any
-  for (const [k, v] of Object.entries(setup)) {
+function rendererIpcFunction(moduleKey: string, item: SetupItem) {
+  const rendererItem = {} as any
+  const channel = {} as any
+  for (const [k, v] of Object.entries(item)) {
     const r = v.renderer as unknown
+    const c = `${moduleKey}::${k}`
+    let fn: Function
     if (typeof r === 'string') {
       if (['invoke', 'send', 'on', 'once'].includes(r)) {
-        renderer[k] = ipcRenderer[r].bind(ipcRenderer, v.channel)
+        fn = ipcRenderer[r].bind(ipcRenderer, c)
       } else {
         throw new TypeError(`invalid renderer function string: ${r}, valid string is 'invoke', 'send', 'on' or 'once'`)
       }
     } else if (typeof r === 'function') {
-      renderer[k] = r
+      fn = r
     } else {
       throw new TypeError(`invalid renderer function: ${r}`)
     }
-    channels[k] = v.channel
+    rendererItem[k] = fn
+    channel[k] = c
+  }
+  return {
+    rendererItem,
+    channel,
+  }
+}
+function generateTypesafeIpcRenderer<
+  T extends SetupModule,
+>(setupModule: T): TypesafeIpcRenderer<T> {
+  const renderer = {} as any
+  const channels = {} as any
+  for (const [module, item] of Object.entries(setupModule)) {
+    const fn = rendererIpcFunction(module, item)
+    renderer[module] = fn.rendererItem
+    channels[module] = fn.channel
   }
   return {
     renderer,
@@ -92,28 +55,46 @@ export function generateRendererIpcFn<T extends SetupObject>(setup: T): Typesafe
     },
   }
 }
-export function generateMainIpcFn<T extends SetupObject>(setup: T): TypesafeMainIpc<T> {
-  const main = {} as any
-  const channels = {} as any
-  for (const [k, v] of Object.entries(setup)) {
+function mainIpcFunction(moduleKey: string, item: SetupItem) {
+  const mainItem = {} as any
+  const channel = {} as any
+  for (const [k, v] of Object.entries(item)) {
     const m = v.main as unknown
-    const c = v.channel
+    const c = `${moduleKey}::${k}`
+    let fn: Function
     if (typeof m === 'string') {
       if (m === 'send') {
-        main[k] = (win: BrowserWindow, data: any) => {
+        fn = (win: BrowserWindow, data: any) => {
           win.webContents.send(c, data)
         }
       } else if (['handle', 'handleOnce', 'on', 'once'].includes(m)) {
-        main[k] = ipcMain[m].bind(ipcMain, c)
+        fn = ipcMain[m].bind(ipcMain, c)
       } else {
         throw new TypeError(`invalid main function string: ${m}, valid string is 'handle', 'on' or 'once'`)
       }
     } else if (typeof m === 'function') {
-      main[k] = m
+      fn = m
     } else {
       throw new TypeError(`invalid main function: ${m}`)
     }
-    channels[k] = c
+    mainItem[k] = fn
+    channel[k] = c
+  }
+  return {
+    mainItem,
+    channel,
+  }
+}
+
+function generateTypesafeIpcMain<
+  T extends SetupModule,
+>(setupRecord: T): TypesafeIpcMain<T> {
+  const main = {} as any
+  const channels = {} as any
+  for (const [module, item] of Object.entries(setupRecord)) {
+    const fn = mainIpcFunction(module, item)
+    main[module] = fn.mainItem
+    channels[module] = fn.channel
   }
   return {
     main,
@@ -124,5 +105,16 @@ export function generateMainIpcFn<T extends SetupObject>(setup: T): TypesafeMain
   }
 }
 
-export { IpcFn, SetupObject, TypesafeMainIpc, TypesafeRendererIpc } from './types'
+export {
+  generateTypesafeIpcModule,
+  generateTypesafeIpcMain,
+  generateTypesafeIpcRenderer,
+}
+
+export type {
+  SetupModule,
+  TypesafeIpcMain,
+  TypesafeIpcRenderer,
+} from './types'
+
 export * from './utils'

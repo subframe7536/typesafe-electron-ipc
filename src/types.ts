@@ -1,6 +1,8 @@
 import type { BrowserWindow, IpcMain, IpcRenderer } from 'electron'
 
 export type Promisable<T> = T | Promise<T>
+export type Prettify<T> = { [K in keyof T]: T[K] } & {}
+
 export type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_: any, data: Data) => CallbackReturn) => Return
 
 export type RendererInvokeFn<Data, Return> = (data: Data) => Return
@@ -21,29 +23,35 @@ export type MainIpcFn =
   | MainOnFn<any>
   | MainSendFn<any>
 
-export type IpcFn<T, K, C extends string = string> = {
+export type IpcFn<T, K> = {
   renderer: T
   main: K
-  channel: C
 }
 
-export type SetupObject = Record<string, IpcFn<RendererIpcFn, MainIpcFn>>
+export type SetupItem = Record<string, IpcFn<RendererIpcFn, MainIpcFn>>
 
-export type TypesafeRendererIpc<T extends SetupObject> = {
-  renderer: {
-    [K in keyof T]: T[K]['renderer']
+export type SetupModule = Record<string, SetupItem>
+
+type Channel<Module extends SetupModule> = Prettify<{
+  [Item in keyof Module]: {
+    [Key in keyof Module[Item]]: `${Extract<Item, string>}::${Extract<Key, string>}`
   }
-  channels: {
-    [K in keyof T]: T[K]['channel']
+}>
+
+type IpcFunction<Module extends SetupModule, P extends 'main' | 'renderer'> = Prettify<{
+  [Item in keyof Module]: {
+    [Key in keyof Module[Item]]: Module[Item][Key][P]
   }
-  clearListeners: (channel: T[keyof T]['channel']) => void
+}>
+
+type TypesafeIpc<Module extends SetupModule> = {
+  channels: Channel<Module>
+  clearListeners: (channel: string) => void
 }
-export type TypesafeMainIpc<T extends SetupObject> = {
-  main: {
-    [K in keyof T]: T[K]['main']
-  }
-  channels: {
-    [K in keyof T]: T[K]['channel']
-  }
-  clearListeners: (channel?: T[keyof T]['channel']) => void
+
+export type TypesafeIpcMain<M extends SetupModule> = TypesafeIpc<M> & {
+  main: IpcFunction<M, 'main'>
+}
+export type TypesafeIpcRenderer<M extends SetupModule> = TypesafeIpc<M> & {
+  renderer: IpcFunction<M, 'renderer'>
 }

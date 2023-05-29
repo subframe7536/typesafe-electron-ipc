@@ -7,9 +7,10 @@ createApp(App)
   .mount('#app')
   .$nextTick(async () => {
     postMessage({ payload: 'removeLoading' }, '*')
-    console.log(await renderer.msg('fetch from renderer'))
-    renderer.front({ test: 1 })
-    renderer.back((_, data) => {
+    const { ipcTest } = renderer
+    console.log(await ipcTest.msg('fetch from renderer'))
+    ipcTest.front({ test: 1 })
+    ipcTest.back((_, data) => {
       console.log(`send from main process: ${data}`)
     })
   })
