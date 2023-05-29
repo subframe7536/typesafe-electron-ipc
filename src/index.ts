@@ -2,7 +2,64 @@ import type { BrowserWindow } from 'electron'
 import { ipcMain, ipcRenderer } from 'electron'
 import type { SetupItem, SetupModule, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
 
-function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'renderer'): TypesafeIpcRenderer<T>
+/**
+ * generate typesafe ipc function modules
+ * @param setupModule module object
+ * @param process will be used in 'renderer' or 'main'
+ *
+ * @example
+ * #### in shared
+ *
+ * for type auto completion,
+ * main/renderer in *IpcFn is cast to function,
+ * but the real type is string
+ *
+ * ```typescript
+ * const state = {
+ *   ipcTest: {
+ *     msg: fetchIpcFn<string, string>(),
+ *     front: rendererSendIpcFn<{ test: number }>(),
+ *     back: mainSendIpcFn<boolean>(),
+ *   }
+ * }
+ * ```
+ *
+ * #### preload.ts
+ *
+ * ```typescript
+ * const {
+ *   renderer,
+ *   clearListeners,
+ *   channels
+ * } = generateTypesafeIpc(state, 'renderer')
+ * contextBridge.exposeInMainWorld('renderer', renderer)
+ * ```
+ *
+ * #### main.ts
+ *
+ * ```typescript
+ * const {
+ *   main: { ipcTest },
+ *   clearListeners,
+ *   channels
+ * } = generateTypesafeIpc(state, 'main')
+ * ipcTest.msg((_, data) => { // data: string
+ *   console.log(data)
+ *   console.log(channels)
+ *   return 'return from main'
+ * })
+ * ```
+ *
+ * #### renderer.ts
+ *
+ * ```typescript
+ * export async function fetch() {
+ *   const msg = await window.renderer.ipcTest.msg('fetch from renderer')
+ *   console.log(msg) // msg: string
+ * }
+ * ```
+ */
+function generateTypesafeIpcModule<T extends SetupModule>(setupModule: T, process: 'renderer'): TypesafeIpcRenderer<T>
 function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'main'): TypesafeIpcMain<T>
 function generateTypesafeIpcModule<T extends SetupModule>(setupRecord: T, process: 'renderer' | 'main') {
   const fn = process === 'renderer'

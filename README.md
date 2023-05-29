@@ -13,21 +13,26 @@ auto generate typesafe ipc functions for electron
  * but the real type is string
  */
 const state = {
-  /**
-   * renderer -> main
-   * ipcRenderer.invoke & ipcMain.handle
-   */
-  msg: fetchIpcFn<string, string>('msg'),
-  /**
-   * renderer -> main
-   * ipcRenderer.send & ipcMain.on
-   */
-  front: rendererSendIpcFn<{ test: number }>('front'),
-  /**
-   * main -> renderer
-   * ipcRenderer.on & BrowserWindow.webContents.send
-   */
-  back: mainSendIpcFn<boolean>('back'),
+  ipcTest: {
+    /**
+     * renderer -> main
+     * ipcRenderer.invoke & ipcMain.handle
+     * channel: ipcTest::msg
+     */
+    msg: fetchIpcFn<string, string>(),
+    /**
+     * renderer -> main
+     * ipcRenderer.send & ipcMain.on
+     * channel: ipcTest::front
+     */
+    front: rendererSendIpcFn<{ test: number }>(),
+    /**
+     * main -> renderer
+     * ipcRenderer.on & BrowserWindow.webContents.send
+     * channel: ipcTest::back
+     */
+    back: mainSendIpcFn<boolean>(),
+  }
 }
 ```
 
@@ -46,11 +51,11 @@ contextBridge.exposeInMainWorld('renderer', renderer)
 
 ```typescript
 const {
-  main,
+  main: { ipcTest },
   clearListeners,
   channels
 } = generateTypesafeIpc(state, 'main')
-main.msg((_, data) => { // data: string
+ipcTest.msg((_, data) => { // data: string
   console.log(data)
   console.log(channels)
   return 'return from main'
@@ -61,7 +66,7 @@ main.msg((_, data) => { // data: string
 
 ```typescript
 export async function fetch() {
-  const msg = await window.renderer.msg('fetch from renderer')
+  const msg = await window.renderer.ipcTest.msg('fetch from renderer')
   console.log(msg) // msg: string
 }
 ```
