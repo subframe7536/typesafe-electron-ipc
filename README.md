@@ -43,7 +43,7 @@ const {
   renderer,
   clearListeners,
   channels
-} = generateTypesafeIpc(state, 'renderer')
+} = generateTypesafeIpcModule(state, 'renderer')
 contextBridge.exposeInMainWorld('renderer', renderer)
 ```
 
@@ -55,9 +55,8 @@ const {
   clearListeners,
   channels
 } = generateTypesafeIpc(state, 'main')
-ipcTest.msg((_, data) => { // data: string
-  console.log(data)
-  console.log(channels)
+ipcTest.msg((_, data) => {
+  console.log(data) // 'fetch from renderer'
   return 'return from main'
 })
 ```
@@ -67,7 +66,7 @@ ipcTest.msg((_, data) => { // data: string
 ```typescript
 export async function fetch() {
   const msg = await window.renderer.ipcTest.msg('fetch from renderer')
-  console.log(msg) // msg: string
+  console.log(msg) // 'return from main'
 }
 ```
 
