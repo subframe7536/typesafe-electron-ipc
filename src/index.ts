@@ -65,20 +65,79 @@ function pathSet(object: any, path: string, value: any) {
     }
   }
 }
-export function generateIpcFnModule<T extends SetupItem>(
-  obj: T, type: 'main'
+
+/**
+ * generate typesafe ipc function modules
+ * @param setupModule module object
+ * @param process will be used in 'renderer' or 'main'
+ *
+ * @example
+ * #### in shared
+ *
+ * ```typescript
+ * const state = {
+ *   ipcTest: {
+ *     msg: fetchIpcFn<string, string>(),
+ *     front: rendererSendIpcFn<{ test: number }>(),
+ *     back: mainSendIpcFn<boolean>(),
+ *     test: {
+ *       deep: fetchIpcFn<string, string>(),
+ *     },
+ *   },
+ *   another: fetchIpcFn<string, string>(),
+ * }
+ * ```
+ *
+ * #### preload.ts
+ *
+ * ```typescript
+ * const {
+ *   renderer,
+ *   clearListeners,
+ *   channels
+ * } = generateTypesafeIpc(state, 'renderer')
+ * contextBridge.exposeInMainWorld('renderer', renderer)
+ * ```
+ *
+ * #### main.ts
+ *
+ * ```typescript
+ * const {
+ *   main: { ipcTest },
+ *   clearListeners,
+ *   channels
+ * } = generateTypesafeIpc(state, 'main')
+ * ipcTest.msg((_, data) => {
+ *   console.log(data) // 'fetch from renderer'
+ *   return 'return from main'
+ * })
+ * ```
+ *
+ * #### renderer.ts
+ *
+ * ```typescript
+ * export async function fetch() {
+ *   const msg = await window.renderer.ipcTest.msg('fetch from renderer')
+ *   console.log(msg) // 'return from main'
+ * }
+ * ```
+ */
+export function generateTypesafeIpc<T extends SetupItem>(
+  setupModule: T, process: 'main'
 ): Prettify<TypesafeIpcMain<T>>
-export function generateIpcFnModule<T extends SetupItem>(
-  obj: T, type: 'renderer'
+export function generateTypesafeIpc<T extends SetupItem>(
+  setupModule: T, process: 'renderer'
 ): Prettify<TypesafeIpcRenderer<T>>
-export function generateIpcFnModule<T extends SetupItem>(
-  obj: T, type: 'main' | 'renderer',
+export function generateTypesafeIpc<T extends SetupItem>(
+  setupModule: T, process: 'main' | 'renderer',
 ): Prettify<TypesafeIpcMain<T>> | Prettify<TypesafeIpcRenderer<T>> {
   const channels = {} // for build performance, don't use Channel<T>
   function parse(obj: SetupItem | GenericIpcFn, path = '') {
     if (isIpcFn(obj)) {
+      // parse channel
       pathSet(channels, path.replace(/::/g, '.'), path)
-      return generateIpcFn(type, obj[type], path)
+      // parse ipc function
+      return generateIpcFn(process, obj[process], path)
     }
     return Object.entries(obj).reduce((acc, [key, value]) => {
       acc[key] = parse(value, path ? `${path}::${key}` : key)
@@ -88,14 +147,14 @@ export function generateIpcFnModule<T extends SetupItem>(
   const ret = {
     channels,
     clearListeners(channel: string) {
-      if (type === 'main') {
+      if (process === 'main') {
         ipcMain?.removeAllListeners(channel)
       } else {
         ipcRenderer?.removeAllListeners(channel)
       }
     },
   }
-  ret[type] = parse(obj)
+  ret[process] = parse(setupModule)
   return ret as any
 }
 

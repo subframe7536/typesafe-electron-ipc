@@ -32,7 +32,21 @@ const state = {
      * channel: ipcTest::back
      */
     back: mainSendIpcFn<boolean>(),
-  }
+    test: {
+      /**
+       * renderer -> main
+       * ipcRenderer.invoke & ipcMain.handle
+       * channel: ipcTest::test::deep
+       */
+      deep: fetchIpcFn<string, string>(),
+    },
+  },
+  /**
+   * renderer -> main
+   * ipcRenderer.invoke & ipcMain.handle
+   * channel: another
+   */
+  another: fetchIpcFn<string, string>(),
 }
 ```
 
@@ -43,7 +57,7 @@ const {
   renderer,
   clearListeners,
   channels
-} = generateTypesafeIpcModule(state, 'renderer')
+} = generateTypesafeIpc(state, 'renderer')
 contextBridge.exposeInMainWorld('renderer', renderer)
 ```
 
@@ -72,4 +86,4 @@ export async function fetch() {
 
 ### example
 
-see in [playground](./playground)
+more usage see in [playground](./playground)
