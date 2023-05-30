@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 import { ipcMain, ipcRenderer } from 'electron'
-import type { GenericIpcFn, IpcFn, MainIpcFn, Prettify, RendererIpcFn, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
+import type { GenericIpcFn, IpcFn, MainIpcFn, RendererIpcFn, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
 
 function rendererIpcFunction(r: unknown, path: string): RendererIpcFn {
   if (typeof r === 'string') {
@@ -124,13 +124,13 @@ function pathSet(object: any, path: string, value: any) {
  */
 export function generateTypesafeIpc<T extends SetupItem>(
   setupModule: T, process: 'main'
-): Prettify<TypesafeIpcMain<T>>
+): TypesafeIpcMain<T>
 export function generateTypesafeIpc<T extends SetupItem>(
   setupModule: T, process: 'renderer'
-): Prettify<TypesafeIpcRenderer<T>>
+): TypesafeIpcRenderer<T>
 export function generateTypesafeIpc<T extends SetupItem>(
   setupModule: T, process: 'main' | 'renderer',
-): Prettify<TypesafeIpcMain<T>> | Prettify<TypesafeIpcRenderer<T>> {
+): TypesafeIpcMain<T> | TypesafeIpcRenderer<T> {
   const channels = {} // for build performance, don't use Channel<T>
   function parse(obj: SetupItem | GenericIpcFn, path = '') {
     if (isIpcFn(obj)) {

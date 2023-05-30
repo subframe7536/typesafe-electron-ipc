@@ -1,7 +1,6 @@
 import type { BrowserWindow, IpcMain, IpcRenderer } from 'electron'
 
 export type Promisable<T> = T | Promise<T>
-export type Prettify<T> = { [K in keyof T]: T[K] } & {}
 type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_: any, data: Data) => CallbackReturn) => Return
 
 export type RendererInvokeFn<Data, Return> = (data: Data) => Return
@@ -32,24 +31,24 @@ export type SetupItem<K = GenericIpcFn> = {
   [key: string]: K | SetupItem<K>
 }
 
-type Channel<Module extends SetupItem, Path extends string = ''> = Prettify<{
+type Channel<Module extends SetupItem, Path extends string = ''> = {
   [Item in keyof Module]: Module[Item] extends GenericIpcFn
     ? `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`
     : Module[Item] extends SetupItem
       ? Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`>
       : never
-}>
+}
 
 type IpcFunction<
   Module extends SetupItem,
   P extends 'main' | 'renderer',
-> = Prettify<{
+> = {
   [Item in keyof Module]: Module[Item] extends GenericIpcFn
     ? Module[Item][P]
     : Module[Item] extends SetupItem
       ? IpcFunction<Module[Item], P>
       : never
-}>
+}
 
 type TypesafeIpc<Module extends SetupItem> = {
   channels: Channel<Module>
@@ -57,8 +56,8 @@ type TypesafeIpc<Module extends SetupItem> = {
 }
 
 export type TypesafeIpcMain<M extends SetupItem> = TypesafeIpc<M> & {
-  main: Prettify<IpcFunction<M, 'main'>>
+  main: IpcFunction<M, 'main'>
 }
 export type TypesafeIpcRenderer<M extends SetupItem> = TypesafeIpc<M> & {
-  renderer: Prettify<IpcFunction<M, 'renderer'>>
+  renderer: IpcFunction<M, 'renderer'>
 }
