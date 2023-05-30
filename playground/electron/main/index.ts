@@ -1,7 +1,7 @@
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { BrowserWindow, app, shell } from 'electron'
-import { generateTypesafeIpcModule } from 'typesafe-electron-ipc'
+import { generateIpcFnModule } from 'typesafe-electron-ipc'
 import { ipcModules } from '../preload/ipc'
 
 // The built directory structure
@@ -45,14 +45,14 @@ const indexHtml = join(process.env.DIST, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
-    icon: join(process.env.PUBLIC, 'favicon.ico'),
+    icon: join(process.env.PUBLIC!, 'favicon.ico'),
     webPreferences: {
       preload,
     },
   })
 
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
-    win.loadURL(url)
+    win.loadURL(url!)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {
@@ -88,15 +88,23 @@ app.on('activate', () => {
     createWindow()
   }
 })
-const { channels, main: { ipcTest } } = generateTypesafeIpcModule(ipcModules, 'main')
+const { channels, main: { ipcTest, another } } = generateIpcFnModule(ipcModules, 'main')
 app.whenReady().then(createWindow).then(() =>
-  win.webContents.on('did-finish-load', () => ipcTest.back(win, true)),
+  win!.webContents.on('did-finish-load', () => ipcTest.back(win!, true)),
 )
 ipcTest.msg((_, data) => {
   console.log(data)
-  console.log(`channels:${JSON.stringify(channels, null, 2)}`)
+  console.log(`channels:${JSON.stringify(channels.ipcTest, null, 2)}`)
   return 'return from main'
 })
 ipcTest.front((_, data) => {
   console.log(`send from renderer process: ${JSON.stringify(data)}`)
+})
+ipcTest.test.deep((_, data) => {
+  console.log(`send deep from main process: ${JSON.stringify(data)}`)
+  return 'deep test from main'
+})
+another((_, data) => {
+  console.log(`send another from main process: ${JSON.stringify(data)}`)
+  return 'another test from main'
 })

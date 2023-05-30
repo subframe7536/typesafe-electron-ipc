@@ -5,5 +5,9 @@ export const ipcModules = {
     msg: fetchIpcFn<string, string>(),
     front: rendererSendIpcFn<{ test: number }>(),
     back: mainSendIpcFn<boolean>(),
+    test: {
+      deep: fetchIpcFn<number, string>(),
+    },
   },
+  another: fetchIpcFn<string, string>(),
 }

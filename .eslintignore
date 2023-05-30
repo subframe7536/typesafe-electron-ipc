@@ -7,3 +7,4 @@ dist-electron
 src/router.ts
 release
 build
+vite.config.ts
