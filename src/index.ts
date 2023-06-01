@@ -77,7 +77,7 @@ function pathSet(object: any, path: string, value: any) {
  * ```typescript
  * const state = {
  *   ipcTest: {
- *     msg: fetchIpcFn<string, string>(),
+ *     msg: fetchIpcFn<string, string>('msg'),
  *     front: rendererSendIpcFn<{ test: number }>(),
  *     back: mainSendIpcFn<boolean>(),
  *     test: {

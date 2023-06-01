@@ -17,9 +17,9 @@ const state = {
     /**
      * renderer -> main
      * ipcRenderer.invoke & ipcMain.handle
-     * channel: ipcTest::msg
+     * channel: msg
      */
-    msg: fetchIpcFn<string, string>(),
+    msg: fetchIpcFn<string, string>('msg'),
     /**
      * renderer -> main
      * ipcRenderer.send & ipcMain.on
