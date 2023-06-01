@@ -2,7 +2,7 @@ import { fetchIpcFn, mainSendIpcFn, rendererSendIpcFn } from 'typesafe-electron-
 
 export const ipcModules = {
   ipcTest: {
-    msg: fetchIpcFn<string, string>(),
+    msg: fetchIpcFn<string, string>('msg'),
     front: rendererSendIpcFn<{ test: number }>(),
     back: mainSendIpcFn<boolean>(),
     test: {

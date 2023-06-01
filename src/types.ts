@@ -21,9 +21,10 @@ export type MainIpcFn =
   | MainOnFn<any>
   | MainSendFn<any>
 
-export type IpcFn<T, K> = {
+export type IpcFn<T, K, C extends string | undefined = string> = {
   renderer: T
   main: K
+  channel?: C
 }
 export type GenericIpcFn = IpcFn<RendererIpcFn, MainIpcFn>
 
@@ -33,7 +34,9 @@ export type SetupItem<K = GenericIpcFn> = {
 
 type Channel<Module extends SetupItem, Path extends string = ''> = {
   [Item in keyof Module]: Module[Item] extends GenericIpcFn
-    ? `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`
+    ? Module[Item]['channel'] extends string
+      ? Module[Item]['channel']
+      : `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`
     : Module[Item] extends SetupItem
       ? Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`>
       : never

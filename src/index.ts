@@ -132,18 +132,24 @@ export function generateTypesafeIpc<T extends SetupItem>(
   setupModule: T, process: 'main' | 'renderer',
 ): TypesafeIpcMain<T> | TypesafeIpcRenderer<T> {
   const channels = {} // for build performance, don't use Channel<T>
-  function parse(obj: SetupItem | GenericIpcFn, path = '') {
-    if (isIpcFn(obj)) {
+  function parse(obj: SetupItem | GenericIpcFn, path = '', acc = {}) {
+    while (true) {
+      if (isIpcFn(obj)) {
       // parse channel
-      pathSet(channels, path.replace(/::/g, '.'), path)
-      // parse ipc function
-      return generateIpcFn(process, obj[process], path)
+        pathSet(channels, path.replace(/::/g, '.'), obj.channel ?? path)
+        // parse ipc function
+        return generateIpcFn(process, obj[process], obj.channel ?? path)
+      }
+      const entries = Object.entries(obj)
+      if (entries.length === 0) {
+        return acc
+      }
+      const [key, value] = entries[0]
+      acc[key] = parse(value, path ? `${path}::${key}` : key, {})
+      obj = Object.fromEntries(entries.slice(1))
     }
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-      acc[key] = parse(value, path ? `${path}::${key}` : key)
-      return acc
-    }, {})
   }
+
   const ret = {
     channels,
     clearListeners(channel: string) {
