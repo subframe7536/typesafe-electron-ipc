@@ -164,5 +164,5 @@ export function generateTypesafeIpc<T extends SetupItem>(
   return ret as any
 }
 
-export { Prettify, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
+export { Prettify, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer, TypesafeEventEmitter } from './types'
 export * from './utils'

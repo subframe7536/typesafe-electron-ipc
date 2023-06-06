@@ -87,3 +87,20 @@ export async function fetch() {
 ### example
 
 more usage see in [playground](./playground)
+
+## Typesafe EventEmitter
+
+```typescript
+export type Test = {
+  test: string
+  version: [data:string, num:number]
+  downloadUrl: [string]
+}
+
+const er = new EventEmitter() as TypedEventEmitter<Test>
+
+er.on('version', (data, num) => { // all type safe
+  console.log(data, num)
+})
+er.emit('version', 'emit', 123456)
+```

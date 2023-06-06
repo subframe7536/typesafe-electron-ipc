@@ -4,7 +4,11 @@ export type Promisable<T> = T | Promise<T>
 export type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}
-type MaybeArray<Data> = Data extends any[] ? Data : [data: Data]
+type MaybeArray<T> = T extends any[]
+  ? T['length'] extends 1
+    ? [data: T[0]]
+    : T
+  : [data: T]
 
 type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_e: Event, ...data: MaybeArray<Data>) => CallbackReturn) => Return
 
@@ -68,4 +72,25 @@ export type TypesafeIpcMain<M extends SetupItem> = TypesafeIpc<M> & {
 }
 export type TypesafeIpcRenderer<M extends SetupItem> = TypesafeIpc<M> & {
   renderer: IpcFunction<M, 'renderer'>
+}
+
+export interface TypesafeEventEmitter<
+  T extends Record<string | symbol, MaybeArray<any>>,
+  Event extends Extract<keyof T, string | symbol> = Extract<keyof T, string | symbol>,
+> extends NodeJS.EventEmitter {
+  addListener<E extends Event> (eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
+  removeListener<E extends Event> (eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
+  removeAllListeners<E extends Event> (event?: E): this
+  setMaxListeners(n: number): this
+  getMaxListeners(): number
+  listeners<E extends Event> (eventName: E): Function[]
+  rawListeners<E extends Event> (eventName: E): Function[]
+  listenerCount<E extends Event> (eventName: E, listener?: Function): number
+  prependListener<E extends Event> (eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
+  prependOnceListener<E extends Event> (eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
+  eventNames(): (Event)[]
+  on<E extends Event>(eventName: E, listener: (...data: MaybeArray<T[E]>) => void): this
+  once<E extends Event>(eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
+  emit<E extends Event>(eventName: E, ...args: MaybeArray<T[E]>): boolean
+  off<E extends Event>(eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
 }
