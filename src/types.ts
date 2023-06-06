@@ -1,13 +1,18 @@
-import type { BrowserWindow, IpcMain, IpcRenderer } from 'electron'
+import type { BrowserWindow, Event, IpcMain, IpcRenderer } from 'electron'
 
 export type Promisable<T> = T | Promise<T>
-type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_: any, data: Data) => CallbackReturn) => Return
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}
+type MaybeArray<Data> = Data extends any[] ? Data : [data: Data]
 
-export type RendererInvokeFn<Data, Return> = (data: Data) => Return
+type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_e: Event, ...data: MaybeArray<Data>) => CallbackReturn) => Return
+
+export type RendererInvokeFn<Data, Return> = (...data: MaybeArray<Data>) => Return
 export type MainHandleFn<Data, Return> = ReceiveFn<Data, Return, void>
 
-export type RendererSendFn<Data> = (data: Data) => void
-export type MainSendFn<Data> = (win: BrowserWindow, data: Data) => void
+export type RendererSendFn<Data> = (...data: MaybeArray<Data>) => void
+export type MainSendFn<Data> = (win: BrowserWindow, ...data: MaybeArray<Data>) => void
 
 export type RendererOnFn<Data> = ReceiveFn<Data, void, IpcRenderer>
 export type MainOnFn<Data> = ReceiveFn<Data, void, IpcMain>
@@ -32,13 +37,13 @@ export type SetupItem<K = GenericIpcFn> = {
   [key: string]: K | SetupItem<K>
 }
 
-type Channel<Module extends SetupItem, Path extends string = ''> = {
+export type Channel<Module extends SetupItem, Path extends string = ''> = {
   [Item in keyof Module]: Module[Item] extends GenericIpcFn
     ? Module[Item]['channel'] extends string
       ? Module[Item]['channel']
       : `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`
     : Module[Item] extends SetupItem
-      ? Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`>
+      ? Prettify<Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`>>
       : never
 }
 

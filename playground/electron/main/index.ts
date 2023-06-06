@@ -97,8 +97,8 @@ ipcTest.msg((_, data) => {
   console.log(`channels:${JSON.stringify(channels, null, 2)}`)
   return 'return from main'
 })
-ipcTest.front((_, data) => {
-  console.log(`send from renderer process: ${JSON.stringify(data)}`)
+ipcTest.front((_, data, stamp) => {
+  console.log(`send from renderer process: ${JSON.stringify(data)}, ${stamp}`)
 })
 ipcTest.test.deep((_, data) => {
   console.log(`send deep from main process: ${JSON.stringify(data)}`)
