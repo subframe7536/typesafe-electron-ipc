@@ -77,7 +77,7 @@ function pathSet(object: any, path: string, value: any) {
  * ```typescript
  * const state = {
  *   ipcTest: {
- *     msg: fetchIpcFn<string, string>('msg'),
+ *     msg: fetchIpcFn<[data: string, num: number], string>('msg'),
  *     front: rendererSendIpcFn<{ test: number }>(),
  *     back: mainSendIpcFn<boolean>(),
  *     test: {
@@ -107,8 +107,8 @@ function pathSet(object: any, path: string, value: any) {
  *   clearListeners,
  *   channels
  * } = generateTypesafeIpc(state, 'main')
- * ipcTest.msg((_, data) => {
- *   console.log(data) // 'fetch from renderer'
+ * ipcTest.msg((_, data, num) => {
+ *   console.log(data, num) // 'fetch from renderer' 123456
  *   return 'return from main'
  * })
  * ```
@@ -117,7 +117,7 @@ function pathSet(object: any, path: string, value: any) {
  *
  * ```typescript
  * export async function fetch() {
- *   const msg = await window.renderer.ipcTest.msg('fetch from renderer')
+ *   const msg = await window.renderer.ipcTest.msg('fetch from renderer', 123456)
  *   console.log(msg) // 'return from main'
  * }
  * ```

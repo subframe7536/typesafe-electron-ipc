@@ -19,7 +19,7 @@ const state = {
      * ipcRenderer.invoke & ipcMain.handle
      * channel: msg
      */
-    msg: fetchIpcFn<string, string>('msg'),
+    msg: fetchIpcFn<[data: string, num: number], string>('msg'),
     /**
      * renderer -> main
      * ipcRenderer.send & ipcMain.on
@@ -69,8 +69,8 @@ const {
   clearListeners,
   channels
 } = generateTypesafeIpc(state, 'main')
-ipcTest.msg((_, data) => {
-  console.log(data) // 'fetch from renderer'
+ipcTest.msg((_, data, num) => {
+  console.log(data, num) // 'fetch from renderer' 123456
   return 'return from main'
 })
 ```
@@ -79,7 +79,7 @@ ipcTest.msg((_, data) => {
 
 ```typescript
 export async function fetch() {
-  const msg = await window.renderer.ipcTest.msg('fetch from renderer')
+  const msg = await window.renderer.ipcTest.msg('fetch from renderer', 123456)
   console.log(msg) // 'return from main'
 }
 ```
