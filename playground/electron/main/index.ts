@@ -100,8 +100,8 @@ ipcTest.msg((_, data) => {
 ipcTest.front((_, data, stamp) => {
   console.log(`send from renderer process: ${JSON.stringify(data)}, ${stamp}`)
 })
-ipcTest.test.deep((_, data) => {
-  console.log(`send deep from main process: ${JSON.stringify(data)}`)
+ipcTest.test.deep(() => {
+  console.log('send deep from main process: empty')
   return 'deep test from main'
 })
 another((_, data) => {

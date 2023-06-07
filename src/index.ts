@@ -81,7 +81,7 @@ function pathSet(object: any, path: string, value: any) {
  *     front: rendererSendIpcFn<{ test: number }>(),
  *     back: mainSendIpcFn<boolean>(),
  *     test: {
- *       deep: fetchIpcFn<string, string>(),
+ *       deep: fetchIpcFn<undefined, string>(),
  *     },
  *   },
  *   another: fetchIpcFn<string, string>(),

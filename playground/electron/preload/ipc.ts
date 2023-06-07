@@ -6,7 +6,7 @@ export const ipcModules = {
     front: rendererSendIpcFn<[test: { test: number }, stamp: number]>(),
     back: mainSendIpcFn<boolean>(),
     test: {
-      deep: fetchIpcFn<number, string>(),
+      deep: fetchIpcFn<undefined, string>(),
     },
   },
   another: fetchIpcFn<string, string>(),

@@ -38,7 +38,7 @@ const state = {
        * ipcRenderer.invoke & ipcMain.handle
        * channel: ipcTest::test::deep
        */
-      deep: fetchIpcFn<string, string>(),
+      deep: fetchIpcFn<undefined, string>(),
     },
   },
   /**

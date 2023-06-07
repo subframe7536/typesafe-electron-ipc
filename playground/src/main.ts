@@ -9,7 +9,7 @@ createApp(App)
     postMessage({ payload: 'removeLoading' }, '*')
     const { ipcTest, another } = renderer
     console.log(await ipcTest.msg('fetch from renderer'))
-    console.log(await ipcTest.test.deep(111))
+    console.log(await ipcTest.test.deep())
     console.log(await another('fetch another from renderer'))
     ipcTest.front({ test: 1 }, Date.now())
     ipcTest.back((_, data) => {
