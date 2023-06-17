@@ -94,7 +94,7 @@ app.whenReady().then(createWindow).then(() =>
 )
 ipcTest.msg((_, data) => {
   console.log(data)
-  console.log(`channels:${JSON.stringify(channels, null, 2)}`)
+  console.log(`channels:${JSON.stringify(channels.ipcTest, null, 2)}`)
   return 'return from main'
 })
 ipcTest.front((_, data, stamp) => {

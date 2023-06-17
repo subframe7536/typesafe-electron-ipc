@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup && cd playground && pnpm i -f && pnpm dev",
+    "dev": "tsup && cd playground && pnpm i -f --frozen-lockfile && pnpm dev",
     "release": "pnpm build && pnpm publish"
   },
   "devDependencies": {
