@@ -4,15 +4,13 @@ export type Promisable<T> = T | Promise<T>
 export type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}
-type MaybeArray<T> = T extends undefined | null | never
+type MaybeArray<T, P = [T]> = T extends undefined | null | never
   ? []
-  : T extends boolean
-    ? [data: boolean]
-    : T extends any[]
-      ? T['length'] extends 1
-        ? [data: T[0]]
-        : T
-      : [data: T]
+  : T extends any[]
+    ? T['length'] extends 1
+      ? [data: T[0]]
+      : T
+    : MaybeArray<P>
 
 type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_e: Event, ...data: MaybeArray<Data>) => CallbackReturn) => Return
 

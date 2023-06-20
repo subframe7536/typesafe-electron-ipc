@@ -9,5 +9,5 @@ export const ipcModules = {
       deep: fetchIpcFn<undefined, string>(),
     },
   },
-  another: fetchIpcFn<string, string>(),
+  another: fetchIpcFn<{ a: number } | { b: string }, string>(),
 }

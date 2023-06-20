@@ -10,7 +10,7 @@ createApp(App)
     const { ipcTest, another } = renderer
     console.log(await ipcTest.msg('fetch from renderer'))
     console.log(await ipcTest.test.deep())
-    console.log(await another('fetch another from renderer'))
+    console.log(await another({ a: 1 }))
     ipcTest.front({ test: 1 }, Date.now())
     ipcTest.back((_, data) => {
       console.log(`send from main process: ${data}`)

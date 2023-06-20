@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup && cd playground && pnpm i -f --frozen-lockfile && pnpm dev",
+    "dev": "tsup && cd playground && pnpm dev",
     "release": "tsup && bumpp"
   },
   "devDependencies": {
@@ -33,6 +33,7 @@
     "electron": "*"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }
