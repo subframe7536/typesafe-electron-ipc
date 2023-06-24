@@ -11,3 +11,4 @@ export const ipcModules = {
   },
   another: fetchIpcFn<{ a: number } | { b: string }, string>(),
 }
+export type IpcModules = typeof ipcModules

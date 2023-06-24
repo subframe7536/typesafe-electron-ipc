@@ -48,27 +48,28 @@ const state = {
    */
   another: fetchIpcFn<string, string>(),
 }
+export type State = typeof state
 ```
 
 #### preload.ts
 
 ```typescript
-const {
-  renderer,
-  clearListeners,
-  channels
-} = generateTypesafeIpc(state, 'renderer')
-contextBridge.exposeInMainWorld('renderer', renderer)
+import { generateTypesafeIPC } from 'typesafe-electron-ipc'
+import { exposeIPC } from 'typesafe-electron-ipc/preload'
+
+exposeIPC(generateTypesafeIPC(state, 'renderer'))
 ```
 
 #### main.ts
 
 ```typescript
+import { generateTypesafeIPC } from 'typesafe-electron-ipc'
+
 const {
   main: { ipcTest },
   clearListeners,
   channels
-} = generateTypesafeIpc(state, 'main')
+} = generateTypesafeIPC(state, 'main')
 ipcTest.msg((_, data, num) => {
   console.log(data, num) // 'fetch from renderer' 123456
   return 'return from main'
@@ -78,8 +79,15 @@ ipcTest.msg((_, data, num) => {
 #### renderer.ts
 
 ```typescript
+import { loadIPC } from 'typesafe-electron-ipc/renderer'
+
+const {
+  renderer: { ipcTest },
+  clearListeners,
+  channels
+} = loadIPC<State>()
 export async function fetch() {
-  const msg = await window.renderer.ipcTest.msg('fetch from renderer', 123456)
+  const msg = await ipcTest.msg('fetch from renderer', 123456)
   console.log(msg) // 'return from main'
 }
 ```

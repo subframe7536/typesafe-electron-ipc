@@ -3,7 +3,6 @@ import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
-import { preload, renderer } from 'unplugin-auto-expose'
 import pkg from './package.json'
 
 // https://vitejs.dev/config/
@@ -17,7 +16,6 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
-      renderer.vite({ preloadEntry: join(__dirname, 'electron/preload/index.ts') }),
       electron([
         {
           // Main-Process entry file of the Electron App.
@@ -48,7 +46,6 @@ export default defineConfig(({ command }) => {
             options.reload()
           },
           vite: {
-            plugins: [preload.vite()],
             build: {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
               minify: isBuild,

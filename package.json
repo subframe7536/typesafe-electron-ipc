@@ -7,6 +7,36 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./preload": {
+      "import": "./dist/preload.mjs",
+      "require": "./dist/preload.cjs"
+    },
+    "./renderer": {
+      "import": "./dist/renderer.mjs",
+      "require": "./dist/renderer.cjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "types": [
+        "dist/types.d.ts"
+      ],
+      "preload": [
+        "dist/preload.d.ts"
+      ],
+      "renderer": [
+        "dist/renderer.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist"
   ],
@@ -19,7 +49,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup && cd playground && pnpm dev",
-    "release": "tsup && bumpp"
+    "release": "tsup && bumpp && npm publish"
   },
   "devDependencies": {
     "@subframe7536/eslint-config": "^0.1.9",

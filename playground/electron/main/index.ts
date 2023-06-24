@@ -1,8 +1,8 @@
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { BrowserWindow, app, shell } from 'electron'
-import { generateTypesafeIpc } from 'typesafe-electron-ipc'
-import { ipcModules } from '../preload/ipc'
+import { generateTypesafeIPC } from 'typesafe-electron-ipc'
+import { ipcModules } from '../ipc'
 
 // The built directory structure
 //
@@ -88,7 +88,7 @@ app.on('activate', () => {
     createWindow()
   }
 })
-const { channels, main: { ipcTest, another } } = generateTypesafeIpc(ipcModules, 'main')
+const { channels, main: { ipcTest, another } } = generateTypesafeIPC(ipcModules, 'main')
 app.whenReady().then(createWindow).then(() =>
   win!.webContents.on('did-finish-load', () => ipcTest.back(win!, true)),
 )

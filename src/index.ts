@@ -122,13 +122,13 @@ function pathSet(object: any, path: string, value: any) {
  * }
  * ```
  */
-export function generateTypesafeIpc<T extends SetupItem>(
+export function generateTypesafeIPC<T extends SetupItem>(
   setupModule: T, process: 'main'
 ): TypesafeIpcMain<T>
-export function generateTypesafeIpc<T extends SetupItem>(
+export function generateTypesafeIPC<T extends SetupItem>(
   setupModule: T, process: 'renderer'
 ): TypesafeIpcRenderer<T>
-export function generateTypesafeIpc<T extends SetupItem>(
+export function generateTypesafeIPC<T extends SetupItem>(
   setupModule: T, process: 'main' | 'renderer',
 ): TypesafeIpcMain<T> | TypesafeIpcRenderer<T> {
   const channels = {} // for build performance, don't use Channel<T>
@@ -164,5 +164,4 @@ export function generateTypesafeIpc<T extends SetupItem>(
   return ret as any
 }
 
-export { Prettify, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer, TypesafeEventEmitter } from './types'
 export * from './utils'
