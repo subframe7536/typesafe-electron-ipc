@@ -1,9 +1,9 @@
+import { rmSync } from 'node:fs'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: [
     'src/index.ts',
-    'src/preload.ts',
     'src/renderer.ts',
     'src/types.ts',
   ],
@@ -18,4 +18,17 @@ export default defineConfig({
       js: `.${format === 'esm' ? 'mjs' : format}`,
     }
   },
+  plugins: [
+    {
+      name: 'rm',
+      buildEnd({ writtenFiles }) {
+        for (const { name } of writtenFiles) {
+          if (name.includes('types')) {
+            rmSync(name)
+            break
+          }
+        }
+      },
+    },
+  ],
 })

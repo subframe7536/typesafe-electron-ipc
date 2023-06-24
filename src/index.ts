@@ -92,8 +92,7 @@ function pathSet(object: any, path: string, value: any) {
  * #### preload.ts
  *
  * ```typescript
- * import { generateTypesafeIPC } from 'typesafe-electron-ipc'
- * import { exposeIPC } from 'typesafe-electron-ipc/preload'
+ * import { generateTypesafeIPC, exposeIPC } from 'typesafe-electron-ipc'
  *
  * exposeIPC(generateTypesafeIPC(state, 'renderer'))
  * ```

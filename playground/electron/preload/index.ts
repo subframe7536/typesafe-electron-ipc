@@ -1,5 +1,4 @@
-import { generateTypesafeIPC } from 'typesafe-electron-ipc'
-import { exposeIPC } from 'typesafe-electron-ipc/preload'
+import { exposeIPC, generateTypesafeIPC } from 'typesafe-electron-ipc'
 import { ipcModules } from '../ipc'
 
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {

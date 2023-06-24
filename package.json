@@ -12,10 +12,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./preload": {
-      "import": "./dist/preload.mjs",
-      "require": "./dist/preload.cjs"
-    },
     "./renderer": {
       "import": "./dist/renderer.mjs",
       "require": "./dist/renderer.cjs"
@@ -29,16 +25,14 @@
       "types": [
         "dist/types.d.ts"
       ],
-      "preload": [
-        "dist/preload.d.ts"
-      ],
       "renderer": [
         "dist/renderer.d.ts"
       ]
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "tsconfig.json"
   ],
   "keywords": [
     "electron",
