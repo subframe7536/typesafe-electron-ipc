@@ -96,3 +96,7 @@ export interface TypesafeEventEmitter<
   emit<E extends Event>(eventName: E, ...args: MaybeArray<T[E]>): boolean
   off<E extends Event>(eventName: E, listener: (...args: MaybeArray<T[E]>) => void): this
 }
+
+export type IpcExposeName = {
+  [k in keyof TypesafeIpcRenderer<any>]?: string
+}

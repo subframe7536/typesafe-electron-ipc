@@ -1,9 +1,9 @@
-import type { SetupItem, TypesafeIpcRenderer } from './types'
+import type { IpcExposeName, SetupItem, TypesafeIpcRenderer } from './types'
 
-export function loadIPC<T extends SetupItem>(): TypesafeIpcRenderer<T> {
+export function loadIPC<T extends SetupItem>(option?: IpcExposeName): TypesafeIpcRenderer<T> {
   return {
-    renderer: globalThis.__renderer,
-    channels: globalThis.__channels,
-    clearListeners: globalThis.__clearListeners,
+    renderer: option?.renderer ?? globalThis.__electron_renderer,
+    channels: option?.channels ?? globalThis.__electron_channels,
+    clearListeners: option?.clearListeners ?? globalThis.__electron_clearListeners,
   }
 }
