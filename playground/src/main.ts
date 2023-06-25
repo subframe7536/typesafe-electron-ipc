@@ -16,4 +16,5 @@ createApp(App)
     ipcTest.back((_, data) => {
       console.log(`send from main process: ${data}`)
     })
+    ipcTest.no()
   })

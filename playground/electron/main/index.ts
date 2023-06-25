@@ -97,6 +97,7 @@ ipcTest.msg((_, data) => {
   console.log(`channels:${JSON.stringify(channels.ipcTest, null, 2)}`)
   return 'return from main'
 })
+ipcTest.no(() => console.log('no parameter'))
 ipcTest.front((_, data, stamp) => {
   console.log(`send from renderer process: ${JSON.stringify(data)}, ${stamp}`)
 })
