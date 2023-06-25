@@ -1,6 +1,6 @@
 {
   "name": "typesafe-electron-ipc",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "subframe7536",
   "license": "MIT",
   "description": "typesafe ipc for electron",
