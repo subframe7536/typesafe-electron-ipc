@@ -4,22 +4,25 @@
   "author": "subframe7536",
   "license": "MIT",
   "description": "typesafe ipc for electron",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
     },
     "./renderer": {
       "import": "./dist/renderer.mjs",
-      "require": "./dist/renderer.cjs"
-    }
+      "require": "./dist/renderer.js"
+    },
+    "./types": "./dist/types.d.ts"
   },
   "files": [
     "dist",
-    "tsconfig.json"
+    "tsconfig.json",
+    "renderer.js",
+    "renderer.d.ts",
+    "types.d.ts"
   ],
   "keywords": [
     "electron",
@@ -28,8 +31,8 @@
     "typesafe"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup && cd playground && pnpm dev",
+    "build": "tsup && node fix-module.js",
+    "dev": "pnpm build && cd playground && pnpm dev",
     "release": "pnpm build && bumpp && npm publish"
   },
   "devDependencies": {

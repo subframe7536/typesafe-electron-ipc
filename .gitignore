@@ -3,3 +3,6 @@ dist
 dist-electron
 pnpm-lock.yaml
 .npmrc
+renderer.js
+renderer.d.ts
+types.d.ts
