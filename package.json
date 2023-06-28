@@ -4,29 +4,16 @@
   "author": "subframe7536",
   "license": "MIT",
   "description": "typesafe ipc for electron",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "exports": {
     ".": {
-      "import": {
-        "default": "./dist/index.mjs",
-        "types": "./dist/index.d.mts"
-      },
-      "require": {
-        "default": "./dist/index.cjs",
-        "types": "./dist/index.d.ts"
-      }
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     },
     "./renderer": {
-      "import": {
-        "default": "./dist/renderer.mjs",
-        "types": "./dist/renderer.d.mts"
-      },
-      "require": {
-        "default": "./dist/renderer.cjs",
-        "types": "./dist/renderer.d.ts"
-      }
+      "import": "./dist/esm/renderer.js",
+      "require": "./dist/cjs/renderer.js"
     }
   },
   "files": [
@@ -40,17 +27,17 @@
     "typesafe"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup && cd playground && pnpm dev",
+    "build": "node build.js",
+    "dev": "pnpm build && cd playground && pnpm dev",
     "release": "pnpm build && bumpp --all && npm publish"
   },
   "devDependencies": {
     "@subframe7536/eslint-config": "^0.1.9",
     "@types/node": "^20.3.2",
     "bumpp": "^9.1.1",
+    "concurrently": "^8.2.0",
     "electron": "^24.4.0",
     "eslint": "^8.43.0",
-    "tsup": "^7.1.0",
     "typescript": "^5.1.5"
   },
   "peerDependencies": {
