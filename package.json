@@ -1,6 +1,6 @@
 {
   "name": "typesafe-electron-ipc",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "author": "subframe7536",
   "license": "MIT",
   "description": "typesafe ipc for electron",
@@ -9,12 +9,24 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.ts"
+      }
     },
     "./renderer": {
-      "import": "./dist/renderer.mjs",
-      "require": "./dist/renderer.cjs"
+      "import": {
+        "default": "./dist/renderer.mjs",
+        "types": "./dist/renderer.d.mts"
+      },
+      "require": {
+        "default": "./dist/renderer.cjs",
+        "types": "./dist/renderer.d.ts"
+      }
     }
   },
   "files": [
@@ -30,7 +42,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup && cd playground && pnpm dev",
-    "release": "pnpm build && bumpp && npm publish"
+    "release": "pnpm build && bumpp --all && npm publish"
   },
   "devDependencies": {
     "@subframe7536/eslint-config": "^0.1.9",
@@ -39,7 +51,7 @@
     "electron": "^24.4.0",
     "eslint": "^8.43.0",
     "tsup": "^7.1.0",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.5"
   },
   "peerDependencies": {
     "electron": "*"

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
     "sourceMap": false,
     "strict": true,
     "jsx": "preserve",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
