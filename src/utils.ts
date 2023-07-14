@@ -5,7 +5,7 @@ import type { IpcExposeName, IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisab
  * renderer -> main
  * ipcRenderer.invoke & ipcMain.handle
  */
-export function fetchIpcFn<Data, Return = Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function fetchIpcFn<Data = void, Return = Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererInvokeFn<Data, Promise<Return>>,
   MainHandleFn<Data, Promisable<Return>>,
   Channel
@@ -21,7 +21,7 @@ export function fetchIpcFn<Data, Return = Data, Channel extends string | undefin
  * renderer -> main
  * ipcRenderer.invoke & ipcMain.handleOnce
  */
-export function fetchOnceIpcFn<Data, Return = Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function fetchOnceIpcFn<Data = void, Return = Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererInvokeFn<Data, Promise<Return>>,
   MainHandleFn<Data, Promisable<Return>>,
   Channel
@@ -36,7 +36,7 @@ export function fetchOnceIpcFn<Data, Return = Data, Channel extends string | und
  * main -> renderer
  * ipcRenderer.on & BrowserWindow.webContents.send
  */
-export function mainSendIpcFn<Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function mainSendIpcFn<Data = void, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererOnFn<Data>,
   MainSendFn<Data>,
   Channel
@@ -51,7 +51,7 @@ export function mainSendIpcFn<Data, Channel extends string | undefined = string>
  * main -> renderer
  * ipcRenderer.once & BrowserWindow.webContents.send
  */
-export function mainSendOnceIpcFn<Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function mainSendOnceIpcFn<Data = void, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererOnFn<Data>,
   MainSendFn<Data>,
   Channel
@@ -66,7 +66,7 @@ export function mainSendOnceIpcFn<Data, Channel extends string | undefined = str
  * renderer -> main
  * ipcRenderer.send & ipcMain.on
  */
-export function rendererSendIpcFn<Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function rendererSendIpcFn<Data = void, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererSendFn<Data>,
   MainOnFn<Data>,
   Channel
@@ -81,7 +81,7 @@ export function rendererSendIpcFn<Data, Channel extends string | undefined = str
  * renderer -> main
  * ipcRenderer.send & ipcMain.once
  */
-export function rendererSendOnceIpcFn<Data, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
+export function rendererSendOnceIpcFn<Data = void, Channel extends string | undefined = string>(channel?: Channel): IpcFn<
   RendererSendFn<Data>,
   MainOnFn<Data>,
   Channel

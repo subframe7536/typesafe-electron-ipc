@@ -4,13 +4,18 @@ export type Promisable<T> = T | Promise<T>
 export type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}
+
 type ParseArray<T, P = [T]> = T extends any[]
   ? T['length'] extends 1
-    ? [data: T[0]]
+    ? T[0] extends unknown
+      ? [data: unknown]
+      : [data: T[0]] | []
     : T
   : T extends number | bigint | string | symbol | boolean | object
     ? ParseArray<P>
-    : []
+    : T extends unknown
+      ? [data: unknown]
+      : []
 
 type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_e: Event, ...data: ParseArray<Data>) => CallbackReturn) => Return
 
