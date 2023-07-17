@@ -31,7 +31,7 @@
     "typesafe"
   ],
   "scripts": {
-    "build": "tsup && node fix-module.js",
+    "build": "tsc --noEmit && tsup && node fix-module.js",
     "dev": "pnpm build && cd playground && pnpm dev",
     "release": "pnpm build && bumpp && npm publish"
   },

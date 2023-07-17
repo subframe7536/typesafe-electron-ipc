@@ -5,17 +5,17 @@ export type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}
 
-type ParseArray<T, P = [T]> = T extends any[]
+export type ParseArray<T, P = [T]> = T extends any[]
   ? T['length'] extends 1
-    ? T[0] extends unknown
-      ? [data: unknown]
-      : [data: T[0]] | []
-    : T
+    ? T[0] extends null | undefined
+      ? []
+      : [data: T[0]]
+    : T['length'] extends 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+      ? T
+      : [data: T]
   : T extends number | bigint | string | symbol | boolean | object
     ? ParseArray<P>
-    : T extends unknown
-      ? [data: unknown]
-      : []
+    : []
 
 type ReceiveFn<Data, CallbackReturn, Return> = (callback: (_e: Event, ...data: ParseArray<Data>) => CallbackReturn) => Return
 
