@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
-import type { IpcExposeName, IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem, TypesafeIpcRenderer } from './types'
+import type { IpcExposeName, IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem } from './types'
+import { generateTypesafeIPC } from '.'
 
 /**
  * renderer -> main
@@ -97,8 +98,8 @@ export function rendererSendOnceIpcFn<Data = void, Channel extends string | unde
  * @param modules predefined ipc modules
  * @param option custom expose name
  */
-export function exposeIPC(modules: TypesafeIpcRenderer<SetupItem>, option?: IpcExposeName) {
-  const { channels, clearListeners, renderer } = modules
+export function exposeIPC(modules: SetupItem, option?: IpcExposeName) {
+  const { channels, clearListeners, renderer } = generateTypesafeIPC(modules, 'renderer')
   contextBridge.exposeInMainWorld(option?.renderer ?? '__electron_renderer', renderer)
   contextBridge.exposeInMainWorld(option?.channels ?? '__electron_channels', channels)
   contextBridge.exposeInMainWorld(option?.clearListeners ?? '__electron_clearListeners', clearListeners)
