@@ -1,10 +1,7 @@
 const { relative, join } = require('node:path/posix')
-const { writeFileSync, mkdirSync, rmSync } = require('node:fs')
+const { writeFileSync, mkdirSync } = require('node:fs')
 const { exports: exp } = require('./package.json')
 
-rmSync('./dist/types.js')
-rmSync('./dist/types.mjs')
-rmSync('./dist/types.d.mts')
 writeFileSync('types.d.ts', 'export * from \'./dist/types\'')
 
 const ROOT_PATH = __dirname

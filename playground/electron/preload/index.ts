@@ -1,4 +1,4 @@
-import { exposeIPC } from 'typesafe-electron-ipc'
+import { exposeIPC, exposeMain } from 'typesafe-electron-ipc'
 import { ipcModules } from '../ipc'
 
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
@@ -97,3 +97,4 @@ window.onmessage = (ev) => {
 setTimeout(removeLoading, 4999)
 
 exposeIPC(ipcModules)
+exposeMain('info', process.versions)

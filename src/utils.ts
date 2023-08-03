@@ -1,5 +1,5 @@
 import { contextBridge } from 'electron'
-import type { IpcExposeName, IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem } from './types'
+import type { IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem } from './types'
 import { generateTypesafeIPC } from '.'
 
 /**
@@ -93,14 +93,40 @@ export function rendererSendOnceIpcFn<Data = void, Channel extends string | unde
     renderer: 'send' as any,
   }
 }
+
+export function pathSet(object: any, path: string, value: any) {
+  let current = object
+  const pathParts = path.split('.')
+
+  for (let i = 0; i < pathParts.length; i++) {
+    const key = pathParts[i]
+
+    if (i === pathParts.length - 1) {
+      current[key] = value
+    } else {
+      if (!current[key]) {
+        current[key] = {}
+      }
+      current = current[key]
+    }
+  }
+}
+
 /**
  * expose IPC to renderer
  * @param modules predefined ipc modules
  * @param option custom expose name
  */
-export function exposeIPC(modules: SetupItem, option?: IpcExposeName) {
+export function exposeIPC(modules: SetupItem, name = '__electron') {
   const { channels, clearListeners, renderer } = generateTypesafeIPC(modules, 'renderer')
-  contextBridge.exposeInMainWorld(option?.renderer ?? '__electron_renderer', renderer)
-  contextBridge.exposeInMainWorld(option?.channels ?? '__electron_channels', channels)
-  contextBridge.exposeInMainWorld(option?.clearListeners ?? '__electron_clearListeners', clearListeners)
+  const ipc = {
+    renderer,
+    channels,
+    clearListeners,
+  }
+  exposeMain(name, ipc)
+}
+
+export function exposeMain(key: string, value: any) {
+  contextBridge.exposeInMainWorld(key, value)
 }

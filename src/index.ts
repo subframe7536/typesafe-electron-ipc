@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import { ipcMain, ipcRenderer } from 'electron'
 import type { GenericIpcFn, IpcFn, MainIpcFn, RendererIpcFn, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
+import { pathSet } from './utils'
 
 function rendererIpcFunction(r: unknown, path: string): RendererIpcFn {
   if (typeof r === 'string') {
@@ -46,24 +47,6 @@ function generateIpcFn(
 
 function isIpcFn(item: unknown): item is IpcFn<any, any> {
   return Boolean(item && typeof item === 'object' && 'renderer' in item && 'main' in item)
-}
-
-function pathSet(object: any, path: string, value: any) {
-  let current = object
-  const pathParts = path.split('.')
-
-  for (let i = 0; i < pathParts.length; i++) {
-    const key = pathParts[i]
-
-    if (i === pathParts.length - 1) {
-      current[key] = value
-    } else {
-      if (!current[key]) {
-        current[key] = {}
-      }
-      current = current[key]
-    }
-  }
 }
 
 /**
@@ -171,4 +154,6 @@ export function generateTypesafeIPC<T extends SetupItem>(
   return ret as any
 }
 
-export * from './utils'
+export {
+  exposeIPC, exposeMain, fetchIpcFn, fetchOnceIpcFn, mainSendIpcFn, mainSendOnceIpcFn, rendererSendIpcFn, rendererSendOnceIpcFn,
+} from './utils'
