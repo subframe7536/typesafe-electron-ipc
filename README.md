@@ -2,6 +2,18 @@
 
 auto generate typesafe ipc functions for electron
 
+### install
+
+```shell
+npm i typesafe-electron-ipc
+```
+```shell
+yarn add typesafe-electron-ipc
+```
+```shell
+pnpm add typesafe-electron-ipc
+```
+
 ### usage
 
 #### in shared
