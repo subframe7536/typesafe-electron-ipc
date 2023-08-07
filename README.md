@@ -54,9 +54,9 @@ export type State = typeof state
 #### preload.ts
 
 ```typescript
-import { generateTypesafeIPC, exposeIPC } from 'typesafe-electron-ipc'
+import { exposeIPC } from 'typesafe-electron-ipc'
 
-exposeIPC(generateTypesafeIPC(state, 'renderer'))
+exposeIPC(state)
 ```
 
 #### main.ts
@@ -84,7 +84,7 @@ const {
   renderer: { ipcTest },
   clearListeners,
   channels
-} = loadIPC<State>()
+} = loadIPC<typeof state>()
 export async function fetch() {
   const msg = await ipcTest.msg('fetch from renderer', 123456)
   console.log(msg) // 'return from main'
