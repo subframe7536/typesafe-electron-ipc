@@ -1,9 +1,10 @@
 import type { BrowserWindow, Event, IpcMain, IpcRenderer } from 'electron'
 
 export type Promisable<T> = T | Promise<T>
-export type Prettify<T> = {
+type DrainOuterGeneric<T> = [T] extends [unknown] ? T : never
+export type Prettify<T> = DrainOuterGeneric<{
   [K in keyof T]: T[K]
-} & {}
+} & {}>
 
 export type ParseArray<T, P = [T]> = T extends any[]
   ? T['length'] extends 1
@@ -48,15 +49,15 @@ export type SetupItem<K = GenericIpcFn> = {
   [key: string]: K | SetupItem<K>
 }
 
-export type Channel<Module extends SetupItem, Path extends string = ''> = {
-  [Item in keyof Module]: Module[Item] extends GenericIpcFn
+export type Channel<Module extends SetupItem, Path extends string = ''> = Prettify<{
+  [Item in keyof Module & string]: Module[Item] extends GenericIpcFn
     ? Module[Item]['channel'] extends string
       ? Module[Item]['channel']
-      : `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`
+      : `${Path}${Path extends '' ? '' : '::'}${Item}`
     : Module[Item] extends SetupItem
-      ? Prettify<Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Extract<Item, string>}`>>
+      ? Channel<Module[Item], `${Path}${Path extends '' ? '' : '::'}${Item}`>
       : never
-}
+}>
 
 type IpcFunction<
   Module extends SetupItem,
