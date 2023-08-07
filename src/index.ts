@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import { ipcMain, ipcRenderer } from 'electron'
+import { pathSet } from 'object-standard-path'
 import type { GenericIpcFn, IpcFn, MainIpcFn, RendererIpcFn, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
-import { pathSet } from './utils'
 
 function rendererIpcFunction(r: unknown, path: string): RendererIpcFn {
   if (typeof r === 'string') {
@@ -126,7 +126,7 @@ export function generateTypesafeIPC<T extends SetupItem>(
     while (true) {
       if (isIpcFn(obj)) {
       // parse channel
-        pathSet(channels, path.replace(/::/g, '.'), obj.channel ?? path)
+        pathSet(channels, path.replace(/::/g, '.') as any, obj.channel ?? path)
         // parse ipc function
         return generateIpcFn(process, obj[process], obj.channel ?? path)
       }
@@ -154,6 +154,4 @@ export function generateTypesafeIPC<T extends SetupItem>(
   return ret as any
 }
 
-export {
-  exposeIPC, exposeMain, fetchIpcFn, fetchOnceIpcFn, mainSendIpcFn, mainSendOnceIpcFn, rendererSendIpcFn, rendererSendOnceIpcFn,
-} from './utils'
+export * from './utils'

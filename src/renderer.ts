@@ -4,7 +4,7 @@ import type { SetupItem, TypesafeIpcRenderer } from './types'
  * load exposed IPC
  * @param option custom expose name
  */
-export function loadIPC<T extends SetupItem>(name = '__electron'): TypesafeIpcRenderer<T> {
+export function loadIPC<T extends SetupItem>(name = '__electron_ipc'): TypesafeIpcRenderer<T> {
   return loadMain(name)
 }
 

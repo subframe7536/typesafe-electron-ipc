@@ -94,36 +94,13 @@ export function rendererSendOnceIpcFn<Data = void, Channel extends string | unde
   }
 }
 
-export function pathSet(object: any, path: string, value: any) {
-  let current = object
-  const pathParts = path.split('.')
-
-  for (let i = 0; i < pathParts.length; i++) {
-    const key = pathParts[i]
-
-    if (i === pathParts.length - 1) {
-      current[key] = value
-    } else {
-      if (!current[key]) {
-        current[key] = {}
-      }
-      current = current[key]
-    }
-  }
-}
-
 /**
  * expose IPC to renderer
  * @param modules predefined ipc modules
  * @param option custom expose name
  */
-export function exposeIPC(modules: SetupItem, name = '__electron') {
-  const { channels, clearListeners, renderer } = generateTypesafeIPC(modules, 'renderer')
-  const ipc = {
-    renderer,
-    channels,
-    clearListeners,
-  }
+export function exposeIPC(modules: SetupItem, name = '__electron_ipc') {
+  const ipc = generateTypesafeIPC(modules, 'renderer')
   exposeMain(name, ipc)
 }
 
