@@ -26,7 +26,7 @@ function mainIpcFunction(m: unknown, path: string): MainIpcFn {
     } else if (['handle', 'handleOnce', 'on', 'once'].includes(m)) {
       return ipcMain[m].bind(ipcMain, path)
     } else {
-      throw new TypeError(`invalid main function string: ${m}, valid string is 'handle', 'on' or 'once'`)
+      throw new TypeError(`invalid main function string: ${m}, valid string is 'send', 'handle', 'on' or 'once'`)
     }
   } else if (typeof m === 'function') {
     return m as MainIpcFn
@@ -40,13 +40,11 @@ function generateIpcFn(
   fn: MainIpcFn | RendererIpcFn,
   path: string,
 ) {
-  return type === 'main'
-    ? mainIpcFunction(fn, path)
-    : rendererIpcFunction(fn, path)
+  return (type === 'main' ? mainIpcFunction : rendererIpcFunction)(fn, path)
 }
 
 function isIpcFn(item: unknown): item is IpcFn<any, any> {
-  return Boolean(item && typeof item === 'object' && 'renderer' in item && 'main' in item)
+  return !!item && typeof item === 'object' && 'renderer' in item && 'main' in item
 }
 
 /**
@@ -123,32 +121,24 @@ export function generateTypesafeIPC<T extends SetupItem>(
 ): TypesafeIpcMain<T> | TypesafeIpcRenderer<T> {
   const channels = {} // for build performance, don't use Channel<T>
   function parse(obj: SetupItem | GenericIpcFn, path = '', acc = {}) {
-    while (true) {
-      if (isIpcFn(obj)) {
-      // parse channel
-        pathSet(channels, path.replace(/::/g, '.') as any, obj.channel ?? path)
-        // parse ipc function
-        return generateIpcFn(process, obj[process], obj.channel ?? path)
-      }
-      const entries = Object.entries(obj)
-      if (entries.length === 0) {
-        return acc
-      }
-      const [key, value] = entries[0]
-      acc[key] = parse(value, path ? `${path}::${key}` : key, {})
-      obj = Object.fromEntries(entries.slice(1))
+    if (isIpcFn(obj)) {
+    // parse channel
+      pathSet(channels, path.replace(/::/g, '.') as any, obj.channel ?? path)
+      // parse ipc function
+      return generateIpcFn(process, obj[process], obj.channel ?? path)
     }
+
+    for (const [key, value] of Object.entries(obj)) {
+      const newPath = path ? `${path}::${key}` : key
+      acc[key] = parse(value, newPath, {})
+    }
+
+    return acc
   }
 
   const ret = {
     channels,
-    clearListeners(channel: string) {
-      if (process === 'main') {
-        ipcMain?.removeAllListeners(channel)
-      } else {
-        ipcRenderer?.removeAllListeners(channel)
-      }
-    },
+    clearListeners: (channel: string) => (process === 'main' ? ipcMain : ipcRenderer)?.removeAllListeners(channel),
   }
   ret[process] = parse(setupModule)
   return ret as any
