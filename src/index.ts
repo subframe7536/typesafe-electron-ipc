@@ -3,35 +3,45 @@ import { ipcMain, ipcRenderer } from 'electron'
 import { pathSet } from 'object-standard-path'
 import type { GenericIpcFn, IpcFn, MainIpcFn, RendererIpcFn, SetupItem, TypesafeIpcMain, TypesafeIpcRenderer } from './types'
 
+const rendererEventList = [
+  'invoke',
+  'send',
+  'on',
+  'once',
+]
+const mainEventList = [
+  'send',
+  'handle',
+  'handleOnce',
+  'on',
+  'once',
+]
+
 function rendererIpcFunction(r: unknown, path: string): RendererIpcFn {
-  if (typeof r === 'string') {
-    if (['invoke', 'send', 'on', 'once'].includes(r)) {
-      return ipcRenderer[r].bind(ipcRenderer, path)
+  if (typeof r === 'number') {
+    if (r < 4 /* rendererEventList.length */) {
+      return ipcRenderer[rendererEventList[r]].bind(ipcRenderer, path)
     } else {
-      throw new TypeError(`invalid renderer function string: ${r}, valid string is 'invoke', 'send', 'on' or 'once'`)
+      throw new Error(`invalid renderer function index: ${r}`)
     }
-  } else if (typeof r === 'function') {
-    return r as RendererIpcFn
   } else {
-    throw new TypeError(`invalid renderer function: ${r}`)
+    return r as RendererIpcFn
   }
 }
 
 function mainIpcFunction(m: unknown, path: string): MainIpcFn {
-  if (typeof m === 'string') {
-    if (m === 'send') {
+  if (typeof m === 'number') {
+    if (m === 0) {
       return (win: BrowserWindow, data: any) => {
         win.webContents.send(path, data)
       }
-    } else if (['handle', 'handleOnce', 'on', 'once'].includes(m)) {
-      return ipcMain[m].bind(ipcMain, path)
+    } else if (m < 5 /* mainEventList.length */) {
+      return ipcMain[mainEventList[m]].bind(ipcMain, path)
     } else {
-      throw new TypeError(`invalid main function string: ${m}, valid string is 'send', 'handle', 'on' or 'once'`)
+      throw new Error(`invalid main function index: ${m}`)
     }
-  } else if (typeof m === 'function') {
-    return m as MainIpcFn
   } else {
-    throw new TypeError(`invalid main function: ${m}`)
+    return m as MainIpcFn
   }
 }
 
