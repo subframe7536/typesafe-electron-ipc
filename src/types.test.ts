@@ -24,6 +24,7 @@ export type SingleArrays = {
 }
 export type MultiArrays = {
   numbers: Expect<Equal<ParseArray<[number, number]>, [number, number]>>
+  optional: Expect<Equal<ParseArray<[test: string, test1?: string]>, [test: string, test1?: string]>>
   mix: Expect<Equal<ParseArray<[string, number, { test: number }]>, [string, number, { test: number }]>>
   mixArrays: Expect<Equal<ParseArray<[{ test: string }[]]>, [{ test: string }[]]>>
 }
