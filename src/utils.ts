@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
-import type { IpcFn, MainHandleFn, MainOnFn, MainSendFn, Promisable, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem } from './types'
+import type { Promisable } from '@subframe7536/type-utils'
+import type { IpcFn, MainHandleFn, MainOnFn, MainSendFn, RendererInvokeFn, RendererOnFn, RendererSendFn, SetupItem } from './types'
 import { generateTypesafeIPC } from '.'
 
 /**
