@@ -1,8 +1,8 @@
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { BrowserWindow, app, shell } from 'electron'
-import { generateTypesafeIPC } from 'typesafe-electron-ipc'
-import { ipcModules } from '../ipc'
+import { useIpcMain } from 'typesafe-electron-ipc'
+import type { IpcSchema } from '../ipc'
 
 // The built directory structure
 //
@@ -21,10 +21,14 @@ process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
   : process.env.DIST
 
 // Disable GPU Acceleration for Windows 7
-if (release().startsWith('6.1')) { app.disableHardwareAcceleration() }
+if (release().startsWith('6.1')) {
+  app.disableHardwareAcceleration()
+}
 
 // Set application name for Windows 10+ notifications
-if (process.platform === 'win32') { app.setAppUserModelId(app.getName()) }
+if (process.platform === 'win32') {
+  app.setAppUserModelId(app.getName())
+}
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -61,7 +65,9 @@ async function createWindow() {
 
   // Make all links open with the browser, not with the application
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https:')) { shell.openExternal(url) }
+    if (url.startsWith('https:')) {
+      shell.openExternal(url)
+    }
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
@@ -69,13 +75,17 @@ async function createWindow() {
 
 app.on('window-all-closed', () => {
   win = null
-  if (process.platform !== 'darwin') { app.quit() }
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 })
 
 app.on('second-instance', () => {
   if (win) {
     // Focus on the main window if the user tried to open another
-    if (win.isMinimized()) { win.restore() }
+    if (win.isMinimized()) {
+      win.restore()
+    }
     win.focus()
   }
 })
@@ -88,24 +98,24 @@ app.on('activate', () => {
     createWindow()
   }
 })
-const { channels, main: { ipcTest, another } } = generateTypesafeIPC(ipcModules, 'main')
-app.whenReady().then(createWindow).then(() =>
-  win!.webContents.on('did-finish-load', () => ipcTest.back(win!, true)),
-)
-ipcTest.msg((_, data) => {
-  console.log(data)
-  console.log(`channels:${JSON.stringify(channels.ipcTest, null, 2)}`)
+
+app.whenReady().then(createWindow)
+
+const main = useIpcMain<IpcSchema>()
+main.handle('ipcTest::msg', (_, data) => {
+  console.log('handle "msg":', data)
   return 'return from main'
 })
-ipcTest.no(() => console.log('no parameter'))
-ipcTest.front((_, data, stamp) => {
-  console.log(`send from renderer process: ${JSON.stringify(data)}, ${stamp}`)
+main.on('ipcTest::no', () => console.log('get data from renderer process without parameter'))
+main.on('ipcTest::front', (_, data, stamp) => {
+  console.log(`get data from renderer process: ${JSON.stringify(data)}, ${stamp}`)
+  main.send(win, 'ipcTest::back', true)
 })
-ipcTest.test.deep(() => {
-  console.log('send deep from main process: empty')
+main.handle('ipcTest::test::deep', () => {
+  console.log('handle "deep": empty')
   return 'deep test from main'
 })
-another((_, data) => {
-  console.log(`send another from main process: ${JSON.stringify(data)}`)
+main.handle('another', (_, data) => {
+  console.log(`handle "another": ${JSON.stringify(data)}`)
   return 'another test from main'
 })

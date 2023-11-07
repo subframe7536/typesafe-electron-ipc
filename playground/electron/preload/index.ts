@@ -1,5 +1,4 @@
-import { exposeIPC, exposeMain } from 'typesafe-electron-ipc'
-import { ipcModules } from '../ipc'
+import { exposeIpcRenderer, exposeMain } from 'typesafe-electron-ipc'
 
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
@@ -96,5 +95,5 @@ window.onmessage = (ev) => {
 
 setTimeout(removeLoading, 4999)
 
-exposeIPC(ipcModules)
+exposeIpcRenderer()
 exposeMain('info', process.versions)

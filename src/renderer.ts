@@ -1,13 +1,16 @@
-import type { SetupItem, TypesafeIpcRenderer } from './types'
+import type { IpcSchema, TypedIpcRenderer } from './types'
 
 /**
- * load exposed IPC
- * @param name custom expose name
+ * create typesafe `ipcRenderer`
+ * @param name custom global key
+ * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-renderer example}
  */
-export function loadIPC<T extends SetupItem>(name = '__electron_ipc'): TypesafeIpcRenderer<T> {
-  return loadMain(name)
+export function useIpcRenderer<T extends IpcSchema>(
+  name = '__ipcRenderer',
+): TypedIpcRenderer<T> {
+  return globalThis[name]
 }
 
-export function loadMain<T>(key: string): T {
+export function useElectron<T>(key: string): T {
   return globalThis[key]
 }

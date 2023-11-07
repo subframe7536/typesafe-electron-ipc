@@ -1,11 +1,15 @@
 {
   "name": "typesafe-electron-ipc",
   "version": "0.6.8",
+  "description": "typesafe ipc for electron",
   "author": "subframe7536",
   "license": "MIT",
-  "description": "typesafe ipc for electron",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "keywords": [
+    "electron",
+    "ipc",
+    "renderer",
+    "typesafe"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -15,45 +19,41 @@
       "import": "./dist/renderer.mjs",
       "require": "./dist/renderer.js"
     },
-    "./types": "./dist/types.d.ts"
+    "./define": "./define.d.ts"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "files": [
+    "define.d.ts",
     "dist",
-    "tsconfig.json",
-    "renderer.js",
     "renderer.d.ts",
-    "types.d.ts"
-  ],
-  "keywords": [
-    "electron",
-    "ipc",
-    "renderer",
-    "typesafe"
+    "renderer.js"
   ],
   "scripts": {
-    "build": "tsup && node fix-module.js",
-    "dev": "pnpm build && cd playground && pnpm dev",
-    "release": "pnpm build && bumpp && npm publish",
-    "lint": "eslint . --fix"
-  },
-  "devDependencies": {
-    "@subframe7536/eslint-config": "^0.2.9",
-    "@types/node": "^20.8.3",
-    "bumpp": "^9.2.0",
-    "electron": "^26.3.0",
-    "eslint": "^8.51.0",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev:e": "cd ./playground && pnpm dev",
+    "release": "pnpm build && bumpp --all && npm publish",
+    "format": "eslint . --fix",
+    "lint": "eslint ."
   },
   "peerDependencies": {
     "electron": "*"
   },
+  "dependencies": {
+    "@subframe7536/type-utils": "^0.1.4"
+  },
+  "devDependencies": {
+    "@subframe7536/eslint-config": "^0.4.1",
+    "@types/node": "^20.8.10",
+    "bumpp": "^9.2.0",
+    "electron": "^27.0.3",
+    "eslint": "^8.53.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
-  },
-  "dependencies": {
-    "@subframe7536/type-utils": "^0.1.1",
-    "object-standard-path": "^0.3.0"
   }
 }

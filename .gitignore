@@ -2,6 +2,3 @@ node_modules
 dist
 dist-electron
 .npmrc
-renderer.js
-renderer.d.ts
-types.d.ts

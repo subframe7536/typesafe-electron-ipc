@@ -1,6 +1,6 @@
 ## typesafe electron ipc
 
-auto generate typesafe ipc functions for electron
+typesafe wrapper for IPC in Electron
 
 ### install
 
@@ -14,93 +14,98 @@ yarn add typesafe-electron-ipc
 pnpm add typesafe-electron-ipc
 ```
 
-### usage
+v1 rewrite all the codes to reduce the runtime part.
 
-#### in shared
+for older version, please install `typesafe-electron-ipc@0.6.8` and see at [v0 branch](https://github.com/subframe7536/typesafe-electron-ipc/tree/v0)
+
+### quick start
+
+#### define IpcSchema
+
+the event name is combine the schema's object path
 
 ```typescript
-/**
- * for type auto completion,
- * main/renderer in *IpcFn is cast to function,
- * but the real type is string
- */
-const state = {
+import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
+
+export type IpcSchema = DefineIpcSchema<{
   ipcTest: {
-    /**
-     * renderer -> main
-     * ipcRenderer.invoke & ipcMain.handle
-     * channel: msg
-     */
-    msg: fetchIpcFn<[data: string, num: number], string>('msg'),
-    /**
-     * renderer -> main
-     * ipcRenderer.send & ipcMain.on
-     * channel: ipcTest::front
-     */
-    front: rendererSendIpcFn<{ test: number }>(),
-    /**
-     * main -> renderer
-     * ipcRenderer.on & BrowserWindow.webContents.send
-     * channel: ipcTest::back
-     */
-    back: mainSendIpcFn<boolean>(),
+    msg: RendererFetch<string, string>
+    front: RendererSend<[test: { test: number }, stamp: number]>
+    back: MainSend<boolean>
+    no: RendererSend
     test: {
-      /**
-       * renderer -> main
-       * ipcRenderer.invoke & ipcMain.handle
-       * channel: ipcTest::test::deep
-       */
-      deep: fetchIpcFn<undefined, string>(),
-    },
-  },
-  /**
-   * renderer -> main
-   * ipcRenderer.invoke & ipcMain.handle
-   * channel: another
-   */
-  another: fetchIpcFn<string, string>(),
-}
-export type State = typeof state
+      deep: RendererFetch<undefined, string>
+    }
+  }
+  another: RendererFetch<{ a: number } | { b: string }, string>
+}, '::'> // ==> chars that combine the key path, '::' by default, customable
 ```
 
-#### preload.ts
+#### in main
 
 ```typescript
-import { exposeIPC } from 'typesafe-electron-ipc'
+import { app, BrowserWindow } from 'electron'
+import { useIpcMain } from 'typesafe-electron-ipc'
+import type { IpcSchema } from '../ipc'
 
-exposeIPC(state)
-```
+const main = useIpcMain<IpcSchema>()
 
-#### main.ts
-
-```typescript
-import { generateTypesafeIPC } from 'typesafe-electron-ipc'
-
-const {
-  main: { ipcTest },
-  clearListeners,
-  channels
-} = generateTypesafeIPC(state, 'main')
-ipcTest.msg((_, data, num) => {
-  console.log(data, num) // 'fetch from renderer' 123456
+// all functions are typesafe
+app.whenReady().then(() => {
+  main.send(BrowserWindow.getAllWindows()[0], 'ipcTest::back', true),
+})
+main.handle('ipcTest::msg', (_, data) => {
   return 'return from main'
 })
+main.on('ipcTest::front', (_, data, stamp) => {
+  console.log(data, stamp)
+})
+
+const clearListener = main.on('ipcTest::no', () => console.log('no parameter'))
+clearListener()
+
+main.handle('ipcTest::test::deep', () => {
+  return 'deep test from main'
+})
+const clearHandler = main.handle('another', (_, data) => {
+  console.log(data)
+  return {
+    msg: 'receive from main',
+    data,
+  }
+})
+clearHandler() // clear handler
 ```
 
-#### renderer.ts
+#### in preload
 
 ```typescript
-import { loadIPC } from 'typesafe-electron-ipc/renderer'
+import { exposeIpcRenderer } from 'typesafe-electron-ipc'
 
-const {
-  renderer: { ipcTest },
-  clearListeners,
-  channels
-} = loadIPC<typeof state>()
-export async function fetch() {
-  const msg = await ipcTest.msg('fetch from renderer', 123456)
-  console.log(msg) // 'return from main'
-}
+exposeIpcRenderer()
+```
+
+
+#### in renderer
+
+```typescript
+import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
+import type { IpcSchema } from '../ipc'
+
+const renderer = useIpcRenderer<IpcSchema>()
+
+// all functions are typesafe
+console.log(await renderer.invoke('ipcTest::msg', 'fetch from renderer'))
+console.log(await renderer.invoke('ipcTest::test::deep'))
+console.log(await renderer.invoke('another', { a: 1 }))
+
+renderer.send('ipcTest::front', { test: 1 }, Date.now())
+renderer.send('ipcTest::no')
+
+const clearListener = renderer.on('ipcTest::back', (_, data) => {
+  console.log(`send from main process: ${data}`)
+})
+clearListener()
 ```
 
 ### example
@@ -110,16 +115,19 @@ more usage see in [playground](./playground)
 ## Typesafe EventEmitter
 
 ```typescript
-export type Test = {
+import type { TypedEventEmitter } from 'typesafe-electron-ipc'
+
+type Test = {
   test: string
-  version: [data:string, num:number]
+  version: [data: string, num: number]
   downloadUrl: [string]
 }
 
-const er = new EventEmitter() as TypedEventEmitter<Test>
+const ee = new EventEmitter() as TypedEventEmitter<Test>
 
-er.on('version', (data, num) => { // all type safe
+// all type safe
+ee.on('version', (data, num) => {
   console.log(data, num)
 })
-er.emit('version', 'emit', 123456)
+ee.emit('version', 'emit', 123456)
 ```

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
-import { loadMain } from 'typesafe-electron-ipc/renderer'
+import { useElectron } from 'typesafe-electron-ipc/renderer'
+import { renderer } from './main'
+
+renderer.on('ipcTest::back', (_, data) => {
+  console.log('get data from main process:', data)
+})
 </script>
 
 <template>
   <div>
-    version: {{ loadMain('info') }}
+    version: {{ useElectron('info') }}
   </div>
   <HelloWorld msg="Electron + Vite + Vue" />
   <div class="flex-center">

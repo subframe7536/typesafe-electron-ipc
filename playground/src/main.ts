@@ -1,20 +1,18 @@
 import { createApp } from 'vue'
 import './style.css'
-import { loadIPC } from 'typesafe-electron-ipc/renderer'
-import type { IpcModules } from '../electron/ipc'
+import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
+import type { IpcSchema } from '../electron/ipc'
 import App from './App.vue'
+
+export const renderer = useIpcRenderer<IpcSchema>()
 
 createApp(App)
   .mount('#app')
   .$nextTick(async () => {
     postMessage({ payload: 'removeLoading' }, '*')
-    const { ipcTest, another } = loadIPC<IpcModules>().renderer
-    console.log(await ipcTest.msg('fetch from renderer'))
-    console.log(await ipcTest.test.deep())
-    console.log(await another({ a: 1 }))
-    ipcTest.front({ test: 1 }, Date.now())
-    ipcTest.back((_, data) => {
-      console.log(`send from main process: ${data}`)
-    })
-    ipcTest.no()
+    console.log('invoke "msg":', await renderer.invoke('ipcTest::msg', 'fetch data'))
+    console.log('invoke "deep":', await renderer.invoke('ipcTest::test::deep'))
+    console.log('invoke "another":', await renderer.invoke('another', { a: 1 }))
+    renderer.send('ipcTest::front', { test: 1 }, Date.now())
+    renderer.send('ipcTest::no')
   })

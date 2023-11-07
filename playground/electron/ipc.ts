@@ -1,15 +1,14 @@
-import { fetchIpcFn, mainSendIpcFn, rendererSendIpcFn } from 'typesafe-electron-ipc'
+import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
 
-export const ipcModules = {
+export type IpcSchema = DefineIpcSchema<{
   ipcTest: {
-    msg: fetchIpcFn<string, string>('msg'),
-    front: rendererSendIpcFn<[test: { test: number }, stamp: number]>(),
-    back: mainSendIpcFn<boolean>(),
-    no: rendererSendIpcFn(),
+    msg: RendererFetch<string, string>
+    front: RendererSend<[test: { test: number }, stamp: number]>
+    back: MainSend<boolean>
+    no: RendererSend
     test: {
-      deep: fetchIpcFn<undefined, string>(),
-    },
-  },
-  another: fetchIpcFn<{ a: number } | { b: string }, string>(),
-}
-export type IpcModules = typeof ipcModules
+      deep: RendererFetch<undefined, string>
+    }
+  }
+  another: RendererFetch<{ a: number } | { b: string }, string>
+}>
