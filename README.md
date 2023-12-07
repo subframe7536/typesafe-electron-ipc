@@ -18,9 +18,9 @@ v1 rewrite all the codes to reduce the runtime part.
 
 for older version, please install `typesafe-electron-ipc@0.6.8` and see at [v0 branch](https://github.com/subframe7536/typesafe-electron-ipc/tree/v0)
 
-### quick start
+### Quick start
 
-#### define IpcSchema
+#### Define IpcSchema
 
 the event name is combine the schema's object path
 
@@ -41,7 +41,7 @@ export type IpcSchema = DefineIpcSchema<{
 }, '::'> // ==> chars that combine the key path, '::' by default, customable
 ```
 
-#### in main
+#### In main
 
 ```typescript
 import { app, BrowserWindow } from 'electron'
@@ -77,7 +77,7 @@ const clearHandler = main.handle('another', (_, data) => {
 clearHandler() // clear handler
 ```
 
-#### in preload
+#### In preload
 
 ```typescript
 import { exposeIpcRenderer } from 'typesafe-electron-ipc'
@@ -86,7 +86,7 @@ exposeIpcRenderer()
 ```
 
 
-#### in renderer
+#### In renderer
 
 ```typescript
 import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
@@ -108,7 +108,7 @@ const clearListener = renderer.on('ipcTest::back', (_, data) => {
 clearListener()
 ```
 
-### example
+### Example
 
 more usage see in [playground](./playground)
 

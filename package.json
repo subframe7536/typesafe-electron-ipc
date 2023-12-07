@@ -37,20 +37,17 @@
     "format": "eslint . --fix",
     "lint": "eslint ."
   },
-  "peerDependencies": {
-    "electron": "*"
-  },
   "dependencies": {
     "@subframe7536/type-utils": "^0.1.4"
   },
   "devDependencies": {
-    "@subframe7536/eslint-config": "^0.4.1",
-    "@types/node": "^20.8.10",
+    "@subframe7536/eslint-config": "^0.5.4",
+    "@types/node": "^20.10.3",
     "bumpp": "^9.2.0",
-    "electron": "^27.0.3",
-    "eslint": "^8.53.0",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "electron": "^28.0.0",
+    "eslint": "^8.55.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
   },
   "publishConfig": {
     "access": "public",
