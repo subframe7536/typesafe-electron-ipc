@@ -1,38 +1,45 @@
 import electron from 'electron'
 import type { BrowserWindow } from 'electron'
 import type { AnyFunction } from '@subframe7536/type-utils'
-import type { IpcSchema, TypedIpcMain } from './types'
+import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
 
 /**
  * create typesafe `ipcMain`
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
  */
 export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
-  const expose = [
-    'handleOnce',
-    'once',
-    'removeAllListeners',
-    'removeHandler',
-    'removeHandler',
-  ].map(key => [key, electron.ipcMain[key]])
-  expose.push(
-    ['handle', (channel: string, listener: AnyFunction) => {
+  return {
+    handleOnce: (channel, listener: AnyFunction) => {
+      electron.ipcMain.handleOnce(channel, listener)
+    },
+    handle: (channel: string, listener: AnyFunction) => {
       electron.ipcMain.handle(channel, listener)
       return () => {
         electron.ipcMain.removeHandler(channel)
       }
-    }],
-    ['on', (channel: string, listener: AnyFunction) => {
+    },
+    on: (channel: string, listener: AnyFunction) => {
       electron.ipcMain.on(channel, listener)
       return () => {
         electron.ipcMain.removeListener(channel, listener)
       }
-    }],
-    ['send', (win: BrowserWindow, channel: string, ...args: any[]) => {
+    },
+    once: (channel: string, listener: AnyFunction) => {
+      electron.ipcMain.once(channel, listener)
+    },
+    send: (win: BrowserWindow, channel: string, ...args: any[]) => {
       win.webContents.send(channel, ...args)
-    }],
-  )
-  return Object.fromEntries(expose)
+    },
+    removeHandler: (channel: string) => {
+      electron.ipcMain.removeHandler(channel)
+    },
+    removeListener: (channel: string, listener: AnyFunction) => {
+      electron.ipcMain.removeListener(channel, listener)
+    },
+    removeAllListeners: (channel?: string) => {
+      electron.ipcMain.removeAllListeners(channel)
+    },
+  }
 }
 
 /**
@@ -41,26 +48,37 @@ export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-preload example}
  */
 export function exposeIpcRenderer(name = '__ipcRenderer') {
-  const expose = [
-    'invoke',
-    'once',
-    'send',
-    'sendToHost',
-    'removeAllListeners',
-    'removeListener',
-    'postMessage',
-  ].map(key => [key, electron.ipcRenderer[key]])
-  expose.push(
-    ['on', (channel: string, listener: AnyFunction) => {
-      electron.ipcRenderer.on(channel, listener)
-      return () => {
-        electron.ipcRenderer.removeListener(channel, listener)
-      }
-    }],
-  )
   electron.contextBridge.exposeInMainWorld(
     name,
-    Object.fromEntries(expose),
+    {
+      invoke: (channel: string, ...args: any[]) => {
+        return electron.ipcRenderer.invoke(channel, ...args)
+      },
+      on: (channel: string, listener: AnyFunction) => {
+        electron.ipcRenderer.on(channel, listener)
+        return () => {
+          electron.ipcRenderer.removeListener(channel, listener)
+        }
+      },
+      once: (channel: string, listener: AnyFunction) => {
+        electron.ipcRenderer.once(channel, listener)
+      },
+      postMessage: (channel: string, message: any, transfer?: MessagePort[]) => {
+        electron.ipcRenderer.postMessage(channel, message, transfer)
+      },
+      send: (channel: string, ...args: any[]) => {
+        electron.ipcRenderer.send(channel, ...args)
+      },
+      sendToHost: (channel: string, ...args: any[]) => {
+        electron.ipcRenderer.sendToHost(channel, ...args)
+      },
+      removeListener: (channel: string, listener: AnyFunction) => {
+        electron.ipcRenderer.removeListener(channel, listener)
+      },
+      removeAllListeners: (channel: string) => {
+        electron.ipcRenderer.removeAllListeners(channel)
+      },
+    } satisfies TypedIpcRenderer<any>,
   )
 }
 /**

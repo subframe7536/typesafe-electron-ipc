@@ -3,6 +3,7 @@ import type {
   ParseParameters,
   Promisable,
   RemoveNeverProps,
+  StringKeys,
 } from '@subframe7536/type-utils'
 import type { BrowserWindow, IpcMainEvent, IpcMainInvokeEvent, IpcRendererEvent } from 'electron'
 import type { MainSend, RendererFetch, RendererSend } from './define'
@@ -39,29 +40,29 @@ export interface TypedIpcMain<
   RendererSend extends Record<string, any[]> = RS<T>,
   RendererFetch extends Record<string, { params: any[]; return: any }> = RF<T>,
 > {
-  send<E extends keyof MainSend>(win: BrowserWindow, channel: E, ...args: MainSend[E]): void
-  handle<E extends keyof RendererFetch>(
+  send<E extends StringKeys<MainSend>>(win: BrowserWindow, channel: E, ...args: MainSend[E]): void
+  handle<E extends StringKeys<RendererFetch>>(
     channel: E,
     listener: (event: IpcMainInvokeEvent, ...args: RendererFetch[E]['params']) => Promisable<RendererFetch[E]['return']>
   ): VoidFunction
-  handleOnce<E extends keyof RendererFetch>(
+  handleOnce<E extends StringKeys<RendererFetch>>(
     channel: E,
     listener: (event: IpcMainInvokeEvent, ...args: RendererFetch[E]['params']) => Promisable<RendererFetch[E]['return']>
   ): void
-  on<E extends keyof RendererSend>(
+  on<E extends StringKeys<RendererSend>>(
     channel: E,
     listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
   ): VoidFunction
-  once<E extends keyof RendererSend>(
+  once<E extends StringKeys<RendererSend>>(
     channel: E,
     listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
-  ): this
-  removeAllListeners(channel?: keyof RendererSend): this
-  removeHandler(channel: keyof RendererFetch): void
-  removeListener<E extends keyof RendererSend>(
+  ): void
+  removeAllListeners(channel?: StringKeys<RendererSend>): void
+  removeHandler(channel: StringKeys<RendererFetch>): void
+  removeListener<E extends StringKeys<RendererSend>>(
     channel: E,
     listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
-  ): this
+  ): void
 }
 /**
  * {@link https://github.com/subframe7536/typesafe-electron-ipc#in-renderer example}
@@ -72,22 +73,22 @@ export interface TypedIpcRenderer<
   RendererSend extends Record<string, any[]> = RS<T>,
   RendererFetch extends Record<string, { params: any[]; return: any }> = RF<T>,
 > {
-  invoke<E extends keyof RendererFetch>(channel: E, ...args: RendererFetch[E]['params']): Promise<RendererFetch[E]['return']>
-  on<E extends keyof MainSend>(
+  invoke<E extends StringKeys<RendererFetch>>(channel: E, ...args: RendererFetch[E]['params']): Promise<RendererFetch[E]['return']>
+  on<E extends StringKeys<MainSend>>(
     channel: E,
     listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
   ): VoidFunction
-  once<E extends keyof MainSend>(
+  once<E extends StringKeys<MainSend>>(
     channel: E,
     listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
-  ): this
-  send<E extends keyof RendererSend>(channel: E, ...args: RendererSend[E]): void
-  sendToHost<E extends keyof RendererSend>(channel: E, ...args: RendererSend[E]): void
-  removeAllListeners(channel: keyof MainSend): this
-  removeListener<E extends keyof MainSend>(
+  ): void
+  send<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
+  sendToHost<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
+  removeAllListeners(channel: StringKeys<MainSend>): void
+  removeListener<E extends StringKeys<MainSend>>(
     channel: E,
     listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
-  ): this
+  ): void
   postMessage(channel: string, message: any, transfer?: MessagePort[]): void
 }
 
