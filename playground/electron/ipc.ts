@@ -1,4 +1,6 @@
 import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
+import { SerializerOptions } from "typesafe-electron-ipc";
+// import { encode, decode } from '@ygoe/msgpack';
 
 export type IpcSchema = DefineIpcSchema<{
   ipcTest: {
@@ -12,3 +14,12 @@ export type IpcSchema = DefineIpcSchema<{
   }
   another: RendererFetch<{ a: number } | { b: string }, string>
 }>
+
+export const options: SerializerOptions = {
+  // serializer: {
+  //   serialize: (data) => {
+  //     return encode(data) as any
+  //   },
+  //   deserialize: (data: any) => decode(data)
+  // }
+}
