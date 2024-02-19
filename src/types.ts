@@ -38,7 +38,7 @@ export interface TypedIpcMain<
   T extends IpcSchema,
   MainSend extends Record<string, any[]> = MS<T>,
   RendererSend extends Record<string, any[]> = RS<T>,
-  RendererFetch extends Record<string, { params: any[]; return: any }> = RF<T>,
+  RendererFetch extends Record<string, { params: any[], return: any }> = RF<T>,
 > {
   send<E extends StringKeys<MainSend>>(win: BrowserWindow, channel: E, ...args: MainSend[E]): void
   handle<E extends StringKeys<RendererFetch>>(
@@ -59,10 +59,6 @@ export interface TypedIpcMain<
   ): void
   removeAllListeners(channel?: StringKeys<RendererSend>): void
   removeHandler(channel: StringKeys<RendererFetch>): void
-  removeListener<E extends StringKeys<RendererSend>>(
-    channel: E,
-    listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
-  ): void
 }
 /**
  * {@link https://github.com/subframe7536/typesafe-electron-ipc#in-renderer example}
@@ -71,7 +67,7 @@ export interface TypedIpcRenderer<
   T extends IpcSchema,
   MainSend extends Record<string, any[]> = MS<T>,
   RendererSend extends Record<string, any[]> = RS<T>,
-  RendererFetch extends Record<string, { params: any[]; return: any }> = RF<T>,
+  RendererFetch extends Record<string, { params: any[], return: any }> = RF<T>,
 > {
   invoke<E extends StringKeys<RendererFetch>>(channel: E, ...args: RendererFetch[E]['params']): Promise<RendererFetch[E]['return']>
   on<E extends StringKeys<MainSend>>(
@@ -85,10 +81,6 @@ export interface TypedIpcRenderer<
   send<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
   sendToHost<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
   removeAllListeners(channel: StringKeys<MainSend>): void
-  removeListener<E extends StringKeys<MainSend>>(
-    channel: E,
-    listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
-  ): void
   postMessage(channel: string, message: any, transfer?: MessagePort[]): void
 }
 
