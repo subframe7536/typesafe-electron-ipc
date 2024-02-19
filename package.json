@@ -41,12 +41,12 @@
     "@subframe7536/type-utils": "^0.1.4"
   },
   "devDependencies": {
-    "@subframe7536/eslint-config": "^0.5.4",
-    "@types/node": "^20.10.3",
-    "bumpp": "^9.2.0",
-    "electron": "^28.0.0",
-    "eslint": "^8.55.0",
-    "tsup": "^8.0.1",
+    "@subframe7536/eslint-config": "^0.5.10",
+    "@types/node": "^20.11.19",
+    "bumpp": "^9.3.0",
+    "electron": "^28.2.3",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.2",
     "typescript": "^5.3.3"
   },
   "publishConfig": {
