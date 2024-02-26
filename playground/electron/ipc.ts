@@ -1,5 +1,6 @@
 import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
-import { SerializerOptions } from "typesafe-electron-ipc";
+import type { SerializerOptions } from 'typesafe-electron-ipc'
+
 // import { encode, decode } from '@ygoe/msgpack';
 
 export type IpcSchema = DefineIpcSchema<{

@@ -85,7 +85,6 @@ import { exposeIpcRenderer } from 'typesafe-electron-ipc'
 exposeIpcRenderer()
 ```
 
-
 #### In renderer
 
 ```typescript

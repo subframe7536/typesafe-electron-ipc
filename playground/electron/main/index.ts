@@ -2,7 +2,7 @@ import { release } from 'node:os'
 import { join } from 'node:path'
 import { BrowserWindow, app, shell } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
-import { options, type IpcSchema } from '../ipc'
+import { type IpcSchema, options } from '../ipc'
 
 // The built directory structure
 //

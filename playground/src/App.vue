@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
 import { useElectron } from 'typesafe-electron-ipc/renderer'
+import HelloWorld from './components/HelloWorld.vue'
 import { renderer } from './main'
 
 renderer.on('ipcTest::back', (_, data) => {
@@ -15,7 +15,11 @@ renderer.on('ipcTest::back', (_, data) => {
   <HelloWorld msg="Electron + Vite + Vue" />
   <div class="flex-center">
     Place static files into the <code>/public</code> folder
-    <img style="width: 2.4em; margin-left: .4em;" src="/logo.svg" alt="Logo">
+    <img
+      style="width: 2.4em; margin-left: .4em;"
+      src="/logo.svg"
+      alt="Logo"
+    >
   </div>
 </template>
 

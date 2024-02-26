@@ -38,14 +38,14 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@subframe7536/type-utils": "^0.1.4"
+    "@subframe7536/type-utils": "^0.1.5"
   },
   "devDependencies": {
     "@subframe7536/eslint-config": "^0.5.10",
-    "@types/node": "^20.11.19",
+    "@types/node": "^20.11.20",
     "bumpp": "^9.3.0",
-    "electron": "^28.2.3",
-    "eslint": "^8.56.0",
+    "electron": "^29.0.1",
+    "eslint": "^8.57.0",
     "tsup": "^8.0.2",
     "typescript": "^5.3.3"
   },
