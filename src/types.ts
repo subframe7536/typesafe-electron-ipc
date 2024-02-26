@@ -34,69 +34,60 @@ type RF<T extends IpcSchema> = RemoveNeverProps<{
 /**
  * {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
  */
-export interface TypedIpcMain<
-  T extends IpcSchema,
-  MainSend extends Record<string, any[]> = MS<T>,
-  RendererSend extends Record<string, any[]> = RS<T>,
-  RendererFetch extends Record<string, { params: any[], return: any }> = RF<T>,
-> {
-  send<E extends StringKeys<MainSend>>(win: BrowserWindow, channel: E, ...args: MainSend[E]): void
-  handle<E extends StringKeys<RendererFetch>>(
+export interface TypedIpcMain<T extends IpcSchema> {
+  send: <E extends StringKeys<MS<T>>>(win: BrowserWindow, channel: E, ...args: MS<T>[E]) => void
+  handle: <E extends StringKeys<RF<T>>>(
     channel: E,
-    listener: (event: IpcMainInvokeEvent, ...args: RendererFetch[E]['params']) => Promisable<RendererFetch[E]['return']>
-  ): VoidFunction
-  handleOnce<E extends StringKeys<RendererFetch>>(
+    listener: (event: IpcMainInvokeEvent, ...args: RF<T>[E]['params']) => Promisable<RF<T>[E]['return']>
+  ) => VoidFunction
+  handleOnce: <E extends StringKeys<RF<T>>>(
     channel: E,
-    listener: (event: IpcMainInvokeEvent, ...args: RendererFetch[E]['params']) => Promisable<RendererFetch[E]['return']>
-  ): void
-  on<E extends StringKeys<RendererSend>>(
+    listener: (event: IpcMainInvokeEvent, ...args: RF<T>[E]['params']) => Promisable<RF<T>[E]['return']>
+  ) => void
+  on: <E extends StringKeys<RS<T>>>(
     channel: E,
-    listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
-  ): VoidFunction
-  once<E extends StringKeys<RendererSend>>(
+    listener: (event: IpcMainEvent, ...args: RS<T>[E]) => void
+  ) => VoidFunction
+  once: <E extends StringKeys<RS<T>>>(
     channel: E,
-    listener: (event: IpcMainEvent, ...args: RendererSend[E]) => void
-  ): void
-  removeAllListeners(channel?: StringKeys<RendererSend>): void
-  removeHandler(channel: StringKeys<RendererFetch>): void
+    listener: (event: IpcMainEvent, ...args: RS<T>[E]) => void
+  ) => void
+  removeAllListeners: (channel?: StringKeys<RS<T>>) => void
+  removeHandler: (channel: StringKeys<RF<T>>) => void
 }
+
 /**
  * {@link https://github.com/subframe7536/typesafe-electron-ipc#in-renderer example}
  */
-export interface TypedIpcRenderer<
-  T extends IpcSchema,
-  MainSend extends Record<string, any[]> = MS<T>,
-  RendererSend extends Record<string, any[]> = RS<T>,
-  RendererFetch extends Record<string, { params: any[], return: any }> = RF<T>,
-> {
-  invoke<E extends StringKeys<RendererFetch>>(channel: E, ...args: RendererFetch[E]['params']): Promise<RendererFetch[E]['return']>
-  on<E extends StringKeys<MainSend>>(
+export interface TypedIpcRenderer<T extends IpcSchema> {
+  invoke: <E extends StringKeys<RF<T>>>(channel: E, ...args: RF<T>[E]['params']) => Promise<RF<T>[E]['return']>
+  on: <E extends StringKeys<MS<T>>>(
     channel: E,
-    listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
-  ): VoidFunction
-  once<E extends StringKeys<MainSend>>(
+    listener: (event: IpcRendererEvent, ...args: MS<T>[E]) => void
+  ) => VoidFunction
+  once: <E extends StringKeys<MS<T>>>(
     channel: E,
-    listener: (event: IpcRendererEvent, ...args: MainSend[E]) => void
-  ): void
-  send<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
-  sendToHost<E extends StringKeys<RendererSend>>(channel: E, ...args: RendererSend[E]): void
-  removeAllListeners(channel: StringKeys<MainSend>): void
-  postMessage(channel: string, message: any, transfer?: MessagePort[]): void
+    listener: (event: IpcRendererEvent, ...args: MS<T>[E]) => void
+  ) => void
+  send: <E extends StringKeys<RS<T>>>(channel: E, ...args: RS<T>[E]) => void
+  sendToHost: <E extends StringKeys<RS<T>>>(channel: E, ...args: RS<T>[E]) => void
+  removeAllListeners: (channel: StringKeys<MS<T>>) => void
+  postMessage: (channel: string, message: any, transfer?: MessagePort[]) => void
 }
 
 export interface TypedEventEmitter<
   T extends Record<string | symbol, ParseParameters<any>>,
   Events extends Extract<keyof T, string | symbol> = Extract<keyof T, string | symbol>,
 > extends NodeJS.EventEmitter {
-  addListener<E extends Events>(eventName: E, listener: ParseFunction<T[E]>): this
-  removeListener<E extends Events>(eventName: E, listener: ParseFunction<T[E]>): this
-  removeAllListeners<E extends Events>(event?: E): this
-  setMaxListeners(n: number): this
-  getMaxListeners(): number
-  listeners<E extends Events>(eventName: E): Function[]
-  rawListeners<E extends Events>(eventName: E): Function[]
-  listenerCount<E extends Events>(eventName: E, listener?: Function): number
-  prependListener<E extends Events>(eventName: E, listener: ParseFunction<T[E]>): this
-  prependOnceListener<E extends Events>(eventName: E, listener: ParseFunction<T[E]>): this
-  eventNames(): Events[]
+  addListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
+  removeListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
+  removeAllListeners: <E extends Events>(event?: E) => this
+  setMaxListeners: (n: number) => this
+  getMaxListeners: () => number
+  listeners: <E extends Events>(eventName: E) => Function[]
+  rawListeners: <E extends Events>(eventName: E) => Function[]
+  listenerCount: <E extends Events>(eventName: E, listener?: Function) => number
+  prependListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
+  prependOnceListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
+  eventNames: () => Events[]
 }

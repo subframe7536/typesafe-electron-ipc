@@ -52,7 +52,21 @@ type PathValue<T, P extends string, Sep extends string> = P extends `${infer Key
 
 /**
  * define ipc schema
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#define-ipcschema example}
+ * @example
+ * import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
+ *
+ * export type IpcSchema = DefineIpcSchema<{
+ *   ipcTest: {
+ *     msg: RendererFetch<string, string>
+ *     front: RendererSend<[test: { test: number }, stamp: number]>
+ *     back: MainSend<boolean>
+ *     no: RendererSend
+ *     test: {
+ *       deep: RendererFetch<undefined, string>
+ *     }
+ *   }
+ *   another: RendererFetch<{ a: number } | { b: string }, string>
+ * }, '::'> // ==> chars that combine the key path, '::' by default, customable
  */
 export type DefineIpcSchema<T, Sep extends string = '::'> = {
   [K in Channels<FilterIpcFn<T>, Sep>]: PathValue<T, K, Sep>
