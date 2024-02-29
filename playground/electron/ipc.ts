@@ -15,12 +15,3 @@ export type IpcSchema = DefineIpcSchema<{
   }
   another: RendererFetch<{ a: number } | { b: string }, string>
 }>
-
-export const options: SerializerOptions = {
-  // serializer: {
-  //   serialize: (data) => {
-  //     return encode(data) as any
-  //   },
-  //   deserialize: (data: any) => decode(data)
-  // }
-}

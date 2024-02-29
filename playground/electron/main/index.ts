@@ -2,7 +2,7 @@ import { release } from 'node:os'
 import { join } from 'node:path'
 import { BrowserWindow, app, shell } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
-import { type IpcSchema, options } from '../ipc'
+import type { IpcSchema } from '../ipc'
 
 // The built directory structure
 //
@@ -101,7 +101,7 @@ app.on('activate', () => {
 
 app.whenReady().then(createWindow)
 
-const main = useIpcMain<IpcSchema>(options)
+const main = useIpcMain<IpcSchema>()
 main.handle('ipcTest::msg', (_, data) => {
   console.log('handle "msg":', data)
   return 'return from main'

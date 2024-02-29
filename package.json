@@ -4,6 +4,7 @@
   "description": "typesafe ipc for electron",
   "author": "subframe7536",
   "license": "MIT",
+  "repository": "https://github.com/subframe7536/typesafe-electron-ipc",
   "keywords": [
     "electron",
     "ipc",
@@ -42,9 +43,9 @@
   },
   "devDependencies": {
     "@subframe7536/eslint-config": "^0.5.10",
-    "@types/node": "^20.11.20",
+    "@types/node": "^20.11.22",
     "bumpp": "^9.3.0",
-    "electron": "^29.0.1",
+    "electron": "^29.1.0",
     "eslint": "^8.57.0",
     "tsup": "^8.0.2",
     "typescript": "^5.3.3"
