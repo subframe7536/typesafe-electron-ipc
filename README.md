@@ -111,6 +111,23 @@ clearListener()
 
 more usage see in [playground](./playground)
 
+### Custom Serializer
+
+```ts
+import { exposeCustomIpcRenderer, useCustomIpcMain } from 'typesafe-electron-ipc'
+import type { SerializerOptions } from 'typesafe-electron-ipc'
+
+const options: SerializerOptions = {
+  serializer: {/* options */}
+}
+
+// main
+const customMain = useCustomIpcMain<IpcSchema>(options)
+
+// preload
+exposeCustomIpcRenderer(options)
+```
+
 ## Typesafe EventEmitter
 
 ```typescript
