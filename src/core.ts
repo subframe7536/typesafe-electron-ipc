@@ -4,60 +4,29 @@ import type { AnyFunction } from '@subframe7536/type-utils'
 import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
 
 /**
- * custom serialize function
- */
-export type SerializerOptions = {
-  serializer?: {
-    serialize: (data: any[]) => string
-    deserialize: (data: string) => any[]
-  } | {
-    serialize: (data: any[]) => ArrayBufferLike
-    deserialize: (data: number[]) => any[]
-  }
-}
-
-const noop = e => e
-
-function getSerializer(options: SerializerOptions = {}) {
-  const { serializer } = options
-  const decode = serializer
-    ? (...args: any[]) => [serializer.deserialize(args[0])]
-    : noop
-  const encode = serializer
-    ? (...args: any[]) => [serializer.serialize(args)]
-    : noop
-
-  return { encode, decode }
-}
-
-/**
  * create typesafe `ipcMain`
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
  */
-export function useIpcMain<T extends IpcSchema>(options: SerializerOptions = {}): TypedIpcMain<T> {
-  const { encode, decode } = getSerializer(options)
-
+export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
   return {
     handleOnce: (channel: string, listener: AnyFunction) => {
-      ipcMain.handleOnce(channel, (e, ...args) => listener(e, ...decode(args)))
+      ipcMain.handleOnce(channel, listener)
     },
     handle: (channel: string, listener: AnyFunction) => {
-      ipcMain.handle(channel, (e, ...args) => listener(e, ...decode(args)))
-      return () => {
-        ipcMain.removeHandler(channel)
-      }
+      ipcMain.handle(channel, listener)
+      return () => ipcMain.removeHandler(channel)
     },
     on: (channel: string, listener: AnyFunction) => {
-      ipcMain.on(channel, (e, ...args) => listener(e, ...decode(args)))
+      ipcMain.on(channel, listener)
       return () => {
         ipcMain.removeListener(channel, listener)
       }
     },
     once: (channel: string, listener: AnyFunction) => {
-      ipcMain.once(channel, (e, ...args) => listener(e, ...decode(args)))
+      ipcMain.once(channel, listener)
     },
     send: (win: BrowserWindow, channel: string, ...args: any[]) => {
-      win.webContents.send(channel, ...encode(args))
+      win.webContents.send(channel, ...args)
     },
     removeHandler: (channel: string) => {
       ipcMain.removeHandler(channel)
@@ -68,43 +37,32 @@ export function useIpcMain<T extends IpcSchema>(options: SerializerOptions = {})
   } satisfies TypedIpcMain<T>
 }
 
-export type ExposeIpcRendererOptions = SerializerOptions & {
-  /**
-   * custom global key,
-   * @default '__ipcRenderer'
-   */
-  name?: string
-}
-
 /**
  * expost typesafe `ipcRenderer`
- * @param options expose options
+ * @param name custom renderer name
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-preload example}
  */
-export function exposeIpcRenderer(options: ExposeIpcRendererOptions = {}) {
-  const { encode, decode } = getSerializer(options)
-
+export function exposeIpcRenderer(name = '__ipcRenderer') {
   contextBridge.exposeInMainWorld(
-    options.name || '__ipcRenderer',
+    name,
     {
       invoke: (channel: string, ...args: any[]) => {
-        return ipcRenderer.invoke(channel, ...encode(args))
+        return ipcRenderer.invoke(channel, ...args)
       },
       send: (channel: string, ...args: any[]) => {
-        ipcRenderer.send(channel, ...encode(args))
+        ipcRenderer.send(channel, ...args)
       },
       sendToHost: (channel: string, ...args: any[]) => {
-        ipcRenderer.sendToHost(channel, ...encode(args))
+        ipcRenderer.sendToHost(channel, ...args)
       },
       on: (channel: string, listener: AnyFunction) => {
-        const _listener = (e: any, ...args: any[]) => listener(e, ...decode(args))
-        ipcRenderer.on(channel, _listener)
+        ipcRenderer.on(channel, listener)
         return () => {
-          ipcRenderer.removeListener(channel, _listener)
+          ipcRenderer.removeListener(channel, listener)
         }
       },
       once: (channel: string, listener: AnyFunction) => {
-        ipcRenderer.once(channel, (e, ...args) => listener(e, ...decode(args)))
+        ipcRenderer.once(channel, listener)
       },
       postMessage: (channel: string, message: any, transfer?: MessagePort[]) => {
         ipcRenderer.postMessage(channel, message, transfer)
