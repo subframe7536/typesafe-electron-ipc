@@ -39,16 +39,16 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@subframe7536/type-utils": "^0.1.5"
+    "@subframe7536/type-utils": "^0.1.6"
   },
   "devDependencies": {
-    "@subframe7536/eslint-config": "^0.5.10",
-    "@types/node": "^20.11.22",
-    "bumpp": "^9.3.0",
-    "electron": "^29.1.0",
-    "eslint": "^8.57.0",
-    "tsup": "^8.0.2",
-    "typescript": "^5.3.3"
+    "@subframe7536/eslint-config": "^0.7.3",
+    "@types/node": "^20.14.12",
+    "bumpp": "^9.4.1",
+    "electron": "28.2.10",
+    "eslint": "^9.7.0",
+    "tsup": "^8.2.2",
+    "typescript": "^5.5.4"
   },
   "publishConfig": {
     "access": "public",

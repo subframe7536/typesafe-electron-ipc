@@ -1,4 +1,5 @@
 import type {
+  AnyFunction,
   ParseFunction,
   ParseParameters,
   Promisable,
@@ -84,9 +85,9 @@ export interface TypedEventEmitter<
   removeAllListeners: <E extends Events>(event?: E) => this
   setMaxListeners: (n: number) => this
   getMaxListeners: () => number
-  listeners: <E extends Events>(eventName: E) => Function[]
-  rawListeners: <E extends Events>(eventName: E) => Function[]
-  listenerCount: <E extends Events>(eventName: E, listener?: Function) => number
+  listeners: <E extends Events>(eventName: E) => AnyFunction[]
+  rawListeners: <E extends Events>(eventName: E) => AnyFunction[]
+  listenerCount: <E extends Events>(eventName: E, listener?: AnyFunction) => number
   prependListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
   prependOnceListener: <E extends Events>(eventName: E, listener: ParseFunction<T[E]>) => this
   eventNames: () => Events[]

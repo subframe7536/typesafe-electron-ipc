@@ -31,10 +31,10 @@ type Channels<
       ? K & string
       : `${Path}${Sep}${K & string}`
     : Channels<
-        T[K],
-        Sep,
-        `${Path}${Path extends '' ? '' : Sep}${K & string}`
-      >;
+      T[K],
+      Sep,
+      `${Path}${Path extends '' ? '' : Sep}${K & string}`
+    >;
 }[keyof T]>
 
 type FilterIpcFn<T> = DrainOuterGeneric<FilterEmptyProps<{
