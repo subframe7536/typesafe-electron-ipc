@@ -1,4 +1,4 @@
-import { contextBridge, ipcMain, ipcRenderer } from 'electron'
+import electron from 'electron'
 import type { BrowserWindow } from 'electron'
 import type { AnyFunction } from '@subframe7536/type-utils'
 import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
@@ -10,29 +10,29 @@ import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
 export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
   return {
     handleOnce: (channel: string, listener: AnyFunction) => {
-      ipcMain.handleOnce(channel, listener)
+      electron.ipcMain.handleOnce(channel, listener)
     },
     handle: (channel: string, listener: AnyFunction) => {
-      ipcMain.handle(channel, listener)
-      return () => ipcMain.removeHandler(channel)
+      electron.ipcMain.handle(channel, listener)
+      return () => electron.ipcMain.removeHandler(channel)
     },
     on: (channel: string, listener: AnyFunction) => {
-      ipcMain.on(channel, listener)
+      electron.ipcMain.on(channel, listener)
       return () => {
-        ipcMain.removeListener(channel, listener)
+        electron.ipcMain.removeListener(channel, listener)
       }
     },
     once: (channel: string, listener: AnyFunction) => {
-      ipcMain.once(channel, listener)
+      electron.ipcMain.once(channel, listener)
     },
     send: (win: BrowserWindow, channel: string, ...args: any[]) => {
       win.webContents.send(channel, ...args)
     },
     removeHandler: (channel: string) => {
-      ipcMain.removeHandler(channel)
+      electron.ipcMain.removeHandler(channel)
     },
     removeAllListeners: (channel?: string) => {
-      ipcMain.removeAllListeners(channel)
+      electron.ipcMain.removeAllListeners(channel)
     },
   } satisfies TypedIpcMain<T>
 }
@@ -42,33 +42,33 @@ export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
  * @param name custom renderer name
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-preload example}
  */
-export function exposeIpcRenderer(name = '__ipcRenderer') {
-  contextBridge.exposeInMainWorld(
+export function exposeIpcRenderer(name = '__ipcRenderer'): void {
+  electron.contextBridge.exposeInMainWorld(
     name,
     {
       invoke: (channel: string, ...args: any[]) => {
-        return ipcRenderer.invoke(channel, ...args)
+        return electron.ipcRenderer.invoke(channel, ...args)
       },
       send: (channel: string, ...args: any[]) => {
-        ipcRenderer.send(channel, ...args)
+        electron.ipcRenderer.send(channel, ...args)
       },
       sendToHost: (channel: string, ...args: any[]) => {
-        ipcRenderer.sendToHost(channel, ...args)
+        electron.ipcRenderer.sendToHost(channel, ...args)
       },
       on: (channel: string, listener: AnyFunction) => {
-        ipcRenderer.on(channel, listener)
+        electron.ipcRenderer.on(channel, listener)
         return () => {
-          ipcRenderer.removeListener(channel, listener)
+          electron.ipcRenderer.removeListener(channel, listener)
         }
       },
       once: (channel: string, listener: AnyFunction) => {
-        ipcRenderer.once(channel, listener)
+        electron.ipcRenderer.once(channel, listener)
       },
       postMessage: (channel: string, message: any, transfer?: MessagePort[]) => {
-        ipcRenderer.postMessage(channel, message, transfer)
+        electron.ipcRenderer.postMessage(channel, message, transfer)
       },
       removeAllListeners: (channel: string) => {
-        ipcRenderer.removeAllListeners(channel)
+        electron.ipcRenderer.removeAllListeners(channel)
       },
     } satisfies TypedIpcRenderer<any>,
   )
@@ -79,6 +79,6 @@ export function exposeIpcRenderer(name = '__ipcRenderer') {
  * @param name expose name
  * @param data expose data
  */
-export function exposeMain(name: string, data: unknown) {
-  contextBridge.exposeInMainWorld(name, data)
+export function exposeMain(name: string, data: unknown): void {
+  electron.contextBridge.exposeInMainWorld(name, data)
 }
