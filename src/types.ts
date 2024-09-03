@@ -32,11 +32,7 @@ type RF<T extends IpcSchema> = RemoveNeverProps<{
     : never;
 }>
 
-/**
- * {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
- */
-export interface TypedIpcMain<T extends IpcSchema> {
-  send: <E extends StringKeys<MS<T>>>(win: BrowserWindow, channel: E, ...args: MS<T>[E]) => void
+interface TypedIpcMainBase<T extends IpcSchema> {
   handle: <E extends StringKeys<RF<T>>>(
     channel: E,
     listener: (event: IpcMainInvokeEvent, ...args: RF<T>[E]['params']) => Promisable<RF<T>[E]['return']>
@@ -55,6 +51,14 @@ export interface TypedIpcMain<T extends IpcSchema> {
   ) => void
   removeAllListeners: (channel?: StringKeys<RS<T>>) => void
   removeHandler: (channel: StringKeys<RF<T>>) => void
+}
+
+export interface TypedIpcMain<T extends IpcSchema> extends TypedIpcMainBase<T> {
+  send: <E extends StringKeys<MS<T>>>(win: BrowserWindow, channel: E, ...args: MS<T>[E]) => void
+}
+
+export interface TypedIpcMainWithBrowser<T extends IpcSchema> extends TypedIpcMainBase<T> {
+  send: <E extends StringKeys<MS<T>>>(channel: E, ...args: MS<T>[E]) => void
 }
 
 /**

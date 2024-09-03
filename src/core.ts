@@ -1,14 +1,27 @@
 import electron from 'electron'
 import type { BrowserWindow } from 'electron'
 import type { AnyFunction } from '@subframe7536/type-utils'
-import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
+import type { IpcSchema, TypedIpcMain, TypedIpcMainWithBrowser, TypedIpcRenderer } from './types'
 
 /**
  * create typesafe `ipcMain`
  * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
  */
-export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
+export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T>
+/**
+ * create typesafe `ipcMain`
+ * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
+ */
+export function useIpcMain<T extends IpcSchema>(window: BrowserWindow): TypedIpcMainWithBrowser<T>
+export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIpcMain<T> | TypedIpcMainWithBrowser<T> {
   return {
+    send: window
+      ? (channel: string, ...args: any[]) => {
+          window.webContents.send(channel, ...args)
+        }
+      : (win: BrowserWindow, channel: string, ...args: any[]) => {
+          win.webContents.send(channel, ...args)
+        },
     handleOnce: (channel: string, listener: AnyFunction) => {
       electron.ipcMain.handleOnce(channel, listener)
     },
@@ -25,16 +38,13 @@ export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T> {
     once: (channel: string, listener: AnyFunction) => {
       electron.ipcMain.once(channel, listener)
     },
-    send: (win: BrowserWindow, channel: string, ...args: any[]) => {
-      win.webContents.send(channel, ...args)
-    },
     removeHandler: (channel: string) => {
       electron.ipcMain.removeHandler(channel)
     },
     removeAllListeners: (channel?: string) => {
       electron.ipcMain.removeAllListeners(channel)
     },
-  } satisfies TypedIpcMain<T>
+  } as TypedIpcMain<T> | TypedIpcMainWithBrowser<T>
 }
 
 /**
