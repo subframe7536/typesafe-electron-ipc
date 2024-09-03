@@ -44,7 +44,7 @@ export type IpcSchema = DefineIpcSchema<{
 #### In main
 
 ```typescript
-import { app, BrowserWindow } from 'electron'
+import { BrowserWindow, app } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
 import type { IpcSchema } from '../ipc'
 
@@ -52,7 +52,7 @@ const main = useIpcMain<IpcSchema>()
 
 // all functions are typesafe
 app.whenReady().then(() => {
-  main.send(BrowserWindow.getAllWindows()[0], 'ipcTest::back', true),
+  main.send(BrowserWindow.getAllWindows()[0], 'ipcTest::back', true)
 })
 main.handle('ipcTest::msg', (_, data) => {
   return 'return from main'
