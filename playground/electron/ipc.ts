@@ -1,16 +1,18 @@
-import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
+import type { IpcSchemaOf } from 'typesafe-electron-ipc/define'
 
-// import { encode, decode } from '@ygoe/msgpack';
+import { defineIpcSchema, mainSend, rendererFetch, rendererSend } from 'typesafe-electron-ipc/define'
 
-export type IpcSchema = DefineIpcSchema<{
+export const ipcSchema = defineIpcSchema({
   ipcTest: {
-    msg: RendererFetch<string, string>
-    front: RendererSend<[test: { test: number }, stamp: number]>
-    back: MainSend<boolean>
-    no: RendererSend
+    msg: rendererFetch<string, string>(),
+    front: rendererSend<[test: { test: number }, stamp: number]>(),
+    back: mainSend<boolean>(),
+    no: rendererSend(),
     test: {
-      deep: RendererFetch<undefined, string>
-    }
-  }
-  another: RendererFetch<{ a: number } | { b: string }, string>
-}>
+      deep: rendererFetch<undefined, string>(),
+    },
+  },
+  another: rendererFetch<{ a: number } | { b: string }, string>(),
+})
+
+export type IpcSchema = IpcSchemaOf<typeof ipcSchema>
