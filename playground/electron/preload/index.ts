@@ -1,6 +1,6 @@
 import { exposeIpcRenderer, exposeMain } from 'typesafe-electron-ipc'
 
-function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
+function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']): Promise<unknown> {
   return new Promise((resolve) => {
     if (condition.includes(document.readyState)) {
       resolve(true)
@@ -35,7 +35,7 @@ const safeDOM = {
  * https://projects.lukehaas.me/css-loaders
  * https://matejkustec.github.io/SpinThatShit
  */
-function useLoading() {
+function useLoading(): { appendLoading: () => void, removeLoading: () => void } {
   const className = 'loaders-css__square-spin'
   const styleContent = `
 @keyframes square-spin {

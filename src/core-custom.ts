@@ -1,7 +1,8 @@
-import electron from 'electron'
-import type { BrowserWindow } from 'electron'
-import type { AnyFunction } from '@subframe7536/type-utils'
 import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
+import type { AnyFunction } from '@subframe7536/type-utils'
+import type { BrowserWindow } from 'electron'
+
+import electron from 'electron'
 
 /**
  * custom serializer for {@link useCustomIpcMain}

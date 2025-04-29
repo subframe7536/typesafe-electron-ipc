@@ -1,8 +1,11 @@
-import { createApp } from 'vue'
-import './style.css'
-import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
 import type { IpcSchema } from '../electron/ipc'
+
+import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
+import { createApp } from 'vue'
+
 import App from './App.vue'
+
+import './style.css'
 
 export const renderer = useIpcRenderer<IpcSchema>()
 

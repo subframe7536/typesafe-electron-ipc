@@ -1,8 +1,10 @@
+import type { IpcSchema } from '../ipc'
+
 import { release } from 'node:os'
 import { join } from 'node:path'
-import { BrowserWindow, app, shell } from 'electron'
+
+import { app, BrowserWindow, shell } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
-import type { IpcSchema } from '../ipc'
 
 // The built directory structure
 //
@@ -46,7 +48,7 @@ const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
-async function createWindow() {
+async function createWindow(): Promise<void> {
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC!, 'favicon.ico'),

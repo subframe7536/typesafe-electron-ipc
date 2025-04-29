@@ -44,9 +44,10 @@ export type IpcSchema = DefineIpcSchema<{
 #### In main
 
 ```typescript
-import { BrowserWindow, app } from 'electron'
-import { useIpcMain } from 'typesafe-electron-ipc'
 import type { IpcSchema } from '../ipc'
+
+import { app, BrowserWindow } from 'electron'
+import { useIpcMain } from 'typesafe-electron-ipc'
 
 const main = useIpcMain<IpcSchema>()
 
@@ -88,8 +89,9 @@ exposeIpcRenderer()
 #### In renderer
 
 ```typescript
-import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
 import type { IpcSchema } from '../ipc'
+
+import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
 
 const renderer = useIpcRenderer<IpcSchema>()
 
@@ -114,8 +116,9 @@ more usage see in [playground](./playground)
 ### Custom Serializer
 
 ```ts
-import { exposeCustomIpcRenderer, useCustomIpcMain } from 'typesafe-electron-ipc'
 import type { SerializerOptions } from 'typesafe-electron-ipc'
+
+import { exposeCustomIpcRenderer, useCustomIpcMain } from 'typesafe-electron-ipc'
 
 const options: SerializerOptions = {
   serializer: {/* options */}

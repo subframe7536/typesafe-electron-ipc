@@ -1,3 +1,4 @@
+import type { MainSend, RendererFetch, RendererSend } from './define'
 import type {
   AnyFunction,
   ParseFunction,
@@ -7,7 +8,6 @@ import type {
   StringKeys,
 } from '@subframe7536/type-utils'
 import type { BrowserWindow, IpcMainEvent, IpcMainInvokeEvent, IpcRendererEvent } from 'electron'
-import type { MainSend, RendererFetch, RendererSend } from './define'
 
 export type IpcSchema = Record<string, MainSend<any> | RendererSend<any> | RendererFetch<any, any>>
 
