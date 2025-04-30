@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useElectron } from 'typesafe-electron-ipc/renderer'
 import HelloWorld from './components/HelloWorld.vue'
+import { MSG } from '../electron/ipc'
 import { renderer } from './main'
 
-renderer.on('ipcTest::back', (_, data) => {
+renderer.on(MSG.ipcTest.back, (_, data) => {
   console.log('get data from main process:', data)
 })
 </script>

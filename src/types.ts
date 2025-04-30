@@ -1,4 +1,3 @@
-import type { MainSend, RendererFetch, RendererSend } from './define'
 import type {
   AnyFunction,
   ParseFunction,
@@ -9,7 +8,29 @@ import type {
 } from '@subframe7536/type-utils'
 import type { BrowserWindow, IpcMainEvent, IpcMainInvokeEvent, IpcRendererEvent } from 'electron'
 
-export type IpcSchema = Record<string, MainSend<any> | RendererSend<any> | RendererFetch<any, any>>
+/**
+ * `ipcMain.send` & `ipcRenderer.on`
+ */
+export type MainSend<T = null> = {
+  '__ipc-MainSend-RendererOn': T
+}
+
+/**
+ * `ipcMain.on` & `ipcRenderer.send`
+ */
+export type RendererSend<T = null> = {
+  '__ipc-RendererSend-MainOn': T
+}
+
+/**
+ * `ipcMain.handle` & `ipcRenderer.invoke`
+ */
+export type RendererFetch<T = null, P = null> = {
+  '__ipc-RendererInvoke-MainHandle': [T, P]
+}
+
+export type IpcFn = MainSend<any> | RendererSend<any> | RendererFetch<any, any>
+export type IpcSchema = Record<string, IpcFn>
 
 type MS<T extends IpcSchema> = RemoveNeverProps<{
   [K in keyof T]: T[K] extends MainSend<infer Data>
@@ -80,6 +101,9 @@ export interface TypedIpcRenderer<T extends IpcSchema> {
   postMessage: (channel: string, message: any, transfer?: MessagePort[]) => void
 }
 
+/**
+ * @deprecated No longer needed, since `@types/node` offer built-in support
+ */
 export interface TypedEventEmitter<
   T extends Record<string | symbol, ParseParameters<any>>,
   Events extends Extract<keyof T, string | symbol> = Extract<keyof T, string | symbol>,

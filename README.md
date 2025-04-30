@@ -1,30 +1,52 @@
 ## typesafe electron ipc
 
-typesafe wrapper for IPC in Electron
+Typesafe wrapper for IPC in Electron
 
-### install
+### Install
 
-```shell
+```sh
 npm i typesafe-electron-ipc
 ```
-```shell
+```sh
 yarn add typesafe-electron-ipc
 ```
-```shell
+```sh
 pnpm add typesafe-electron-ipc
 ```
 
 v1 rewrite all the codes to reduce the runtime part.
 
-for older version, please install `typesafe-electron-ipc@0.6.8` and see at [v0 branch](https://github.com/subframe7536/typesafe-electron-ipc/tree/v0)
+For older version, please install `typesafe-electron-ipc@0.6.8` and see at [v0 branch](https://github.com/subframe7536/typesafe-electron-ipc/tree/v0)
 
-### Quick start
+### Quick Start
 
 #### Define IpcSchema
 
-the event name is combine the schema's object path
+The event name is the schema's object path combined with separator.
 
-```typescript
+```ts
+import type { IpcSchemaOf } from 'typesafe-electron-ipc/define'
+
+import { defineIpcSchema, mainSend, rendererFetch, rendererSend } from 'typesafe-electron-ipc/define'
+
+export const MSG = defineIpcSchema({
+  ipcTest: {
+    msg: rendererFetch<string, string>(),
+    front: rendererSend<[test: { test: number }, stamp: number]>(),
+    back: mainSend<boolean>(),
+    no: rendererSend(),
+    test: {
+      deep: rendererFetch<undefined, string>(),
+    },
+  },
+  another: rendererFetch<{ a: number } | { b: string }, string>(),
+})
+
+export type IpcSchema = IpcSchemaOf<typeof MSG>
+```
+
+Or you can define type-only schema
+```ts
 import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
 
 export type IpcSchema = DefineIpcSchema<{
@@ -41,31 +63,34 @@ export type IpcSchema = DefineIpcSchema<{
 }, '::'> // ==> chars that combine the key path, '::' by default, customable
 ```
 
-#### In main
+#### In Main Process
 
-```typescript
+```ts
 import type { IpcSchema } from '../ipc'
 
 import { app, BrowserWindow } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
 
+import { MSG } from '../ipc'
+
 const main = useIpcMain<IpcSchema>()
 
 // all functions are typesafe
 app.whenReady().then(() => {
-  main.send(BrowserWindow.getAllWindows()[0], 'ipcTest::back', true)
+  main.send(BrowserWindow.getAllWindows()[0], MSG.ipcTest.back, true)
 })
-main.handle('ipcTest::msg', (_, data) => {
+
+main.handle(MSG.ipcTest.msg, (_, data) => {
   return 'return from main'
 })
-main.on('ipcTest::front', (_, data, stamp) => {
+main.on(MSG.ipcTest.front, (_, data, stamp) => {
   console.log(data, stamp)
 })
 
-const clearListener = main.on('ipcTest::no', () => console.log('no parameter'))
+const clearListener = main.on(MSG.ipcTest.no, () => console.log('no parameter'))
 clearListener()
 
-main.handle('ipcTest::test::deep', () => {
+main.handle(MSG.ipcTest.test.deep, () => {
   return 'deep test from main'
 })
 const clearHandler = main.handle('another', (_, data) => {
@@ -80,7 +105,7 @@ clearHandler() // clear handler
 
 #### In preload
 
-```typescript
+```ts
 import { exposeIpcRenderer } from 'typesafe-electron-ipc'
 
 exposeIpcRenderer()
@@ -88,22 +113,24 @@ exposeIpcRenderer()
 
 #### In renderer
 
-```typescript
+```ts
 import type { IpcSchema } from '../ipc'
 
 import { useIpcRenderer } from 'typesafe-electron-ipc/renderer'
 
+import { MSG } from '../ipc'
+
 const renderer = useIpcRenderer<IpcSchema>()
 
 // all functions are typesafe
-console.log(await renderer.invoke('ipcTest::msg', 'fetch from renderer'))
-console.log(await renderer.invoke('ipcTest::test::deep'))
+console.log(await renderer.invoke(MSG.ipcTest.msg, 'fetch from renderer'))
+console.log(await renderer.invoke(MSG.ipcTest.test.deep))
 console.log(await renderer.invoke('another', { a: 1 }))
 
-renderer.send('ipcTest::front', { test: 1 }, Date.now())
-renderer.send('ipcTest::no')
+renderer.send(MSG.ipcTest.front, { test: 1 }, Date.now())
+renderer.send(MSG.ipcTest.no)
 
-const clearListener = renderer.on('ipcTest::back', (_, data) => {
+const clearListener = renderer.on(MSG.ipcTest.back, (_, data) => {
   console.log(`send from main process: ${data}`)
 })
 clearListener()
@@ -131,9 +158,11 @@ const customMain = useCustomIpcMain<IpcSchema>(options)
 exposeCustomIpcRenderer(options)
 ```
 
-## Typesafe EventEmitter
+## Typesafe EventEmitter (Deprecated)
 
-```typescript
+No longer needed, since `@types/node` offer built-in support
+
+```ts
 import type { TypedEventEmitter } from 'typesafe-electron-ipc'
 
 type Test = {

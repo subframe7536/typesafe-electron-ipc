@@ -2,7 +2,7 @@ import type { IpcSchemaOf } from 'typesafe-electron-ipc/define'
 
 import { defineIpcSchema, mainSend, rendererFetch, rendererSend } from 'typesafe-electron-ipc/define'
 
-export const ipcSchema = defineIpcSchema({
+export const MSG = defineIpcSchema({
   ipcTest: {
     msg: rendererFetch<string, string>(),
     front: rendererSend<[test: { test: number }, stamp: number]>(),
@@ -15,4 +15,4 @@ export const ipcSchema = defineIpcSchema({
   another: rendererFetch<{ a: number } | { b: string }, string>(),
 })
 
-export type IpcSchema = IpcSchemaOf<typeof ipcSchema>
+export type IpcSchema = IpcSchemaOf<typeof MSG>

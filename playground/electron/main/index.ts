@@ -6,6 +6,8 @@ import { join } from 'node:path'
 import { app, BrowserWindow, shell } from 'electron'
 import { useIpcMain } from 'typesafe-electron-ipc'
 
+import { MSG } from '../ipc'
+
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -104,20 +106,20 @@ app.on('activate', () => {
 app.whenReady().then(createWindow)
 
 const main = useIpcMain<IpcSchema>()
-main.handle('ipcTest::msg', (_, data) => {
+main.handle(MSG.ipcTest.msg, (_, data) => {
   console.log('handle "msg":', data)
   return 'return from main'
 })
-main.on('ipcTest::no', () => console.log('get data from renderer process without parameter'))
-main.on('ipcTest::front', (_, data, stamp) => {
+main.on(MSG.ipcTest.no, () => console.log('get data from renderer process without parameter'))
+main.on(MSG.ipcTest.front, (_, data, stamp) => {
   console.log(`get data from renderer process: ${JSON.stringify(data)}, ${stamp}`)
   main.send(win, 'ipcTest::back', true)
 })
-main.handle('ipcTest::test::deep', () => {
+main.handle(MSG.ipcTest.test.deep, () => {
   console.log('handle "deep": empty')
   return 'deep test from main'
 })
-main.handle('another', (_, data) => {
+main.handle(MSG.another, (_, data) => {
   console.log(`handle "another": ${JSON.stringify(data)}`)
   return 'another test from main'
 })
