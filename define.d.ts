@@ -1,1 +1,1 @@
-export * from './dist/define'
+export * from './dist/define.cjs'
