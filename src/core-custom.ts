@@ -38,34 +38,32 @@ function getSerializer(options: SerializerOptions): { encode: AnyFunction, decod
 export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions): TypedIpcMain<T> {
   const { encode, decode } = getSerializer(options)
 
+  const wrapListener = (listener: AnyFunction) =>
+    (e: any, ...args: any[]) => listener(e, ...decode(args))
+
   return {
-    handleOnce: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.handleOnce(channel, (e, ...args) => listener(e, ...decode(args)))
-    },
+    handleOnce: (channel: string, listener: AnyFunction) =>
+      electron.ipcMain.handleOnce(channel, wrapListener(listener)),
+
     handle: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.handle(channel, (e, ...args) => listener(e, ...decode(args)))
-      return () => {
-        electron.ipcMain.removeHandler(channel)
-      }
+      electron.ipcMain.handle(channel, wrapListener(listener))
+      return () => electron.ipcMain.removeHandler(channel)
     },
+
     on: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.on(channel, (e, ...args) => listener(e, ...decode(args)))
-      return () => {
-        electron.ipcMain.removeListener(channel, listener)
-      }
+      const wrapped = wrapListener(listener)
+      electron.ipcMain.on(channel, wrapped)
+      return () => electron.ipcMain.removeListener(channel, wrapped)
     },
-    once: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.once(channel, (e, ...args) => listener(e, ...decode(args)))
-    },
-    send: (win: BrowserWindow, channel: string, ...args: any[]) => {
-      win.webContents.send(channel, ...encode(args))
-    },
-    removeHandler: (channel: string) => {
-      electron.ipcMain.removeHandler(channel)
-    },
-    removeAllListeners: (channel?: string) => {
-      electron.ipcMain.removeAllListeners(channel)
-    },
+
+    once: (channel: string, listener: AnyFunction) =>
+      electron.ipcMain.once(channel, wrapListener(listener)),
+
+    send: (win: BrowserWindow, channel: string, ...args: any[]) =>
+      win.webContents.send(channel, ...encode(args)),
+
+    removeHandler: electron.ipcMain.removeHandler.bind(electron.ipcMain),
+    removeAllListeners: electron.ipcMain.removeAllListeners.bind(electron.ipcMain),
   } satisfies TypedIpcMain<T>
 }
 
@@ -87,35 +85,29 @@ export type ExposeCustomIpcRendererOptions = SerializerOptions & {
  */
 export function exposeCustomIpcRenderer(options: ExposeCustomIpcRendererOptions): void {
   const { encode, decode } = getSerializer(options)
+  const { ipcRenderer } = electron
+
+  const wrapListener = (listener: AnyFunction) =>
+    (e: any, ...args: any[]) => listener(e, ...decode(args))
 
   electron.contextBridge.exposeInMainWorld(
     options.name || '__ipcRenderer',
     {
-      invoke: (channel: string, ...args: any[]) => {
-        return electron.ipcRenderer.invoke(channel, ...encode(args))
-      },
-      send: (channel: string, ...args: any[]) => {
-        electron.ipcRenderer.send(channel, ...encode(args))
-      },
-      sendToHost: (channel: string, ...args: any[]) => {
-        electron.ipcRenderer.sendToHost(channel, ...encode(args))
-      },
+      invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...encode(args)),
+      send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...encode(args)),
+      sendToHost: (channel: string, ...args: any[]) => ipcRenderer.sendToHost(channel, ...encode(args)),
+
       on: (channel: string, listener: AnyFunction) => {
-        const _listener = (e: any, ...args: any[]): void => listener(e, ...decode(args))
-        electron.ipcRenderer.on(channel, _listener)
-        return () => {
-          electron.ipcRenderer.removeListener(channel, _listener)
-        }
+        const wrapped = wrapListener(listener)
+        ipcRenderer.on(channel, wrapped)
+        return () => ipcRenderer.removeListener(channel, wrapped)
       },
-      once: (channel: string, listener: AnyFunction) => {
-        electron.ipcRenderer.once(channel, (e, ...args) => listener(e, ...decode(args)))
-      },
-      postMessage: (channel: string, message: any, transfer?: MessagePort[]) => {
-        electron.ipcRenderer.postMessage(channel, message, transfer)
-      },
-      removeAllListeners: (channel: string) => {
-        electron.ipcRenderer.removeAllListeners(channel)
-      },
+
+      once: (channel: string, listener: AnyFunction) =>
+        ipcRenderer.once(channel, wrapListener(listener)),
+
+      postMessage: ipcRenderer.postMessage.bind(ipcRenderer),
+      removeAllListeners: ipcRenderer.removeAllListeners.bind(ipcRenderer),
     } satisfies TypedIpcRenderer<any>,
   )
 }
