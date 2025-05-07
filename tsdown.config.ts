@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: [
@@ -6,11 +6,11 @@ export default defineConfig({
     'src/renderer.ts',
     'src/define.ts',
   ],
-  clean: true,
   format: ['cjs', 'esm'],
-  shims: true,
-  dts: true,
-  treeshake: true,
+  fixedExtension: true,
+  dts: {
+    resolve: true,
+    isolatedDeclarations: true,
+  },
   external: ['electron'],
-  noExternal: ['object-standard-path'],
 })

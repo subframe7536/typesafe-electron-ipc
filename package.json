@@ -15,15 +15,18 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./renderer": {
       "import": "./dist/renderer.mjs",
-      "require": "./dist/renderer.js"
+      "require": "./dist/renderer.cjs"
     },
-    "./define": "./define.d.ts"
+    "./define": {
+      "import": "./dist/define.mjs",
+      "require": "./dist/define.cjs"
+    }
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "files": [
     "define.d.ts",
@@ -32,23 +35,21 @@
     "renderer.js"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "dev:e": "cd ./playground && pnpm dev",
     "release": "pnpm build && bumpp --all && npm publish",
     "format": "eslint . --fix",
     "lint": "eslint ."
   },
-  "dependencies": {
-    "@subframe7536/type-utils": "^0.1.6"
-  },
   "devDependencies": {
     "@subframe7536/eslint-config": "^1.2.4",
-    "@types/node": "^22.15.3",
+    "@subframe7536/type-utils": "^0.1.6",
+    "@types/node": "^22.15.14",
     "bumpp": "^10.1.0",
     "electron": "28.2.10",
-    "eslint": "^9.25.1",
-    "tsup": "^8.4.0",
+    "eslint": "^9.26.0",
+    "tsdown": "^0.11.0",
     "typescript": "^5.8.3"
   },
   "publishConfig": {
