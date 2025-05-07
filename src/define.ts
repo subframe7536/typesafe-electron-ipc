@@ -45,8 +45,9 @@ type IpcSchemaResult<T, Sep extends string> = ChannelMap<T, Sep> extends infer S
 export type IpcSchemaOf<T> = T extends { ['~ipc']?: infer S } ? S : never
 
 /**
- * define ipc schema
+ * Define type-only ipc schema
  * @example
+ * ```ts
  * import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
  *
  * export type IpcSchema = DefineIpcSchema<{
@@ -61,6 +62,7 @@ export type IpcSchemaOf<T> = T extends { ['~ipc']?: infer S } ? S : never
  *   }
  *   another: RendererFetch<{ a: number } | { b: string }, string>
  * }, '::'> // ==> chars that combine the key path, '::' by default, customable
+ * ```
  */
 export type DefineIpcSchema<T, Sep extends string = '::'> = IpcSchemaOf<IpcSchemaResult<T, Sep>>
 
@@ -81,12 +83,13 @@ export function mainSend<T = null>(): MainSend<T> {
 /**
  * Util to create IpcSchema, get its key and types
  * @param schema Schema object
- * @param sep separator, default to `::`
+ * @param sep Separator, default to `::`
  * @returns Schema key object and types
  * @example
+ * ```ts
  * import { defineIpcSchema, mainSend, rendererFetch, rendererSend } from 'typesafe-electron-ipc/define'
  *
- * export const ipcSchema = defineIpcSchema({
+ * export const MSG = defineIpcSchema({
  *   ipcTest: {
  *     msg: rendererFetch<string, string>(),
  *     front: rendererSend<[test: { test: number }, stamp: number]>(),
@@ -98,9 +101,9 @@ export function mainSend<T = null>(): MainSend<T> {
  *   },
  *   another: rendererFetch<{ a: number } | { b: string }, string>(),
  * })
- * ipcSchema.ipcTest.test.deep
+ * MSG.ipcTest.test.deep
  * // ipcTest::test::deep
- * typeof ipcSchema['~ipc'] // type only property
+ * typeof MSG['~ipc'] // type only property
  * // DefineIpcSchema<{
  * //   ipcTest: {
  * //     msg: RendererFetch<string, string>
@@ -113,6 +116,7 @@ export function mainSend<T = null>(): MainSend<T> {
  * //   }
  * //   another: RendererFetch<{ a: number } | { b: string }, string>
  * // }, '::'>
+ * ```
  */
 export function defineIpcSchema<
   T extends object,

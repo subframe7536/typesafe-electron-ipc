@@ -5,13 +5,41 @@ import type { BrowserWindow } from 'electron'
 import electron from 'electron'
 
 /**
- * create typesafe `ipcMain`
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
+ * Create typesafe `ipcMain`
+ * @example
+ * ```ts
+ * import type { IpcSchema } from '../ipc'
+ *
+ * import { app, BrowserWindow } from 'electron'
+ * import { useIpcMain } from 'typesafe-electron-ipc'
+ *
+ * import { MSG } from '../ipc'
+ *
+ * const main = useIpcMain<IpcSchema>()
+ * // all functions are typesafe
+ * app.whenReady().then(() => {
+ *   main.send(BrowserWindow.getAllWindows()[0], MSG.ipcTest.back, true)
+ * })
+ * ```
  */
 export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T>
 /**
- * create typesafe `ipcMain`
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
+ * Create typesafe `ipcMain`
+ * @example
+ * ```ts
+ * import type { IpcSchema } from '../ipc'
+ *
+ * import { app, BrowserWindow } from 'electron'
+ * import { useIpcMain } from 'typesafe-electron-ipc'
+ *
+ * import { MSG } from '../ipc'
+ *
+ * const main = useIpcMain<IpcSchema>(BrowserWindow.getAllWindows()[0])
+ * // all functions are typesafe
+ * app.whenReady().then(() => {
+ *   main.send(MSG.ipcTest.back, true)
+ * })
+ * ```
  */
 export function useIpcMain<T extends IpcSchema>(window: BrowserWindow): TypedIpcMainWithBrowser<T>
 export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIpcMain<T> | TypedIpcMainWithBrowser<T> {
@@ -35,9 +63,14 @@ export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIp
   } as TypedIpcMain<T> | TypedIpcMainWithBrowser<T>
 }
 /**
- * expost typesafe `ipcRenderer`
- * @param name custom renderer name
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-preload example}
+ * Expose typesafe `ipcRenderer`
+ * @param name Custom renderer name
+ * @example
+ * ```ts
+ * import { exposeIpcRenderer } from 'typesafe-electron-ipc'
+ *
+ * exposeIpcRenderer()
+ * ```
  */
 export function exposeIpcRenderer(name = '__ipcRenderer'): void {
   const { ipcRenderer } = electron
@@ -59,9 +92,9 @@ export function exposeIpcRenderer(name = '__ipcRenderer'): void {
 }
 
 /**
- * wrapper for `contextBridge.exposeInMainWorld`
- * @param name expose name
- * @param data expose data
+ * Wrapper for `contextBridge.exposeInMainWorld`
+ * @param name Exposed name
+ * @param data Exposed data
  */
 export function exposeMain(name: string, data: unknown): void {
   electron.contextBridge.exposeInMainWorld(name, data)

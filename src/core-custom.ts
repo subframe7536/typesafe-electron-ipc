@@ -32,8 +32,19 @@ function getSerializer(options: SerializerOptions): { encode: AnyFunction, decod
 }
 
 /**
- * create typesafe `ipcMain` with custom serializer
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-main example}
+ * Create typesafe `ipcMain` with custom serializer
+ * @example
+ * ```ts
+ * import type { SerializerOptions } from 'typesafe-electron-ipc'
+ *
+ * import { useCustomIpcMain } from 'typesafe-electron-ipc'
+ *
+ * const options: SerializerOptions = {
+ *   serializer: {} // options
+ * }
+ *
+ * const customMain = useCustomIpcMain<IpcSchema>(options)
+ * ```
  */
 export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions): TypedIpcMain<T> {
   const { encode, decode } = getSerializer(options)
@@ -79,9 +90,20 @@ export type ExposeCustomIpcRendererOptions = SerializerOptions & {
 }
 
 /**
- * expost typesafe `ipcRenderer` with custom serializer
- * @param options expose options
- * @see {@link https://github.com/subframe7536/typesafe-electron-ipc#in-preload example}
+ * Expose typesafe `ipcRenderer` with custom serializer
+ * @param options Expose options
+ * @example
+ * ```ts
+ * import type { SerializerOptions } from 'typesafe-electron-ipc'
+ *
+ * import { exposeCustomIpcRenderer } from 'typesafe-electron-ipc'
+ *
+ * const options: SerializerOptions = {
+ *   serializer: {} // options
+ * }
+ *
+ * exposeCustomIpcRenderer(options)
+ * ```
  */
 export function exposeCustomIpcRenderer(options: ExposeCustomIpcRendererOptions): void {
   const { encode, decode } = getSerializer(options)
