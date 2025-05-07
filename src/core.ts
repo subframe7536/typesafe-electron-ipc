@@ -73,20 +73,19 @@ export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIp
  * ```
  */
 export function exposeIpcRenderer(name = '__ipcRenderer'): void {
-  const { ipcRenderer } = electron
-  electron.contextBridge.exposeInMainWorld(
+  exposeMain(
     name,
     {
-      invoke: ipcRenderer.invoke.bind(ipcRenderer),
-      send: ipcRenderer.send.bind(ipcRenderer),
-      sendToHost: ipcRenderer.sendToHost.bind(ipcRenderer),
+      invoke: electron.ipcRenderer.invoke.bind(electron.ipcRenderer),
+      send: electron.ipcRenderer.send.bind(electron.ipcRenderer),
+      sendToHost: electron.ipcRenderer.sendToHost.bind(electron.ipcRenderer),
       on: (channel: string, listener: AnyFunction) => {
-        ipcRenderer.on(channel, listener)
-        return () => ipcRenderer.removeListener(channel, listener)
+        electron.ipcRenderer.on(channel, listener)
+        return () => electron.ipcRenderer.removeListener(channel, listener)
       },
-      once: ipcRenderer.once.bind(ipcRenderer),
-      postMessage: ipcRenderer.postMessage.bind(ipcRenderer),
-      removeAllListeners: ipcRenderer.removeAllListeners.bind(ipcRenderer),
+      once: electron.ipcRenderer.once.bind(electron.ipcRenderer),
+      postMessage: electron.ipcRenderer.postMessage.bind(electron.ipcRenderer),
+      removeAllListeners: electron.ipcRenderer.removeAllListeners.bind(electron.ipcRenderer),
     } satisfies TypedIpcRenderer<any>,
   )
 }

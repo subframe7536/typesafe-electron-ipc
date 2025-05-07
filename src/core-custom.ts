@@ -4,6 +4,8 @@ import type { BrowserWindow } from 'electron'
 
 import electron from 'electron'
 
+import { exposeMain } from './core'
+
 /**
  * custom serializer for {@link useCustomIpcMain}
  */
@@ -107,29 +109,28 @@ export type ExposeCustomIpcRendererOptions = SerializerOptions & {
  */
 export function exposeCustomIpcRenderer(options: ExposeCustomIpcRendererOptions): void {
   const { encode, decode } = getSerializer(options)
-  const { ipcRenderer } = electron
 
   const wrapListener = (listener: AnyFunction) =>
     (e: any, ...args: any[]) => listener(e, ...decode(args))
 
-  electron.contextBridge.exposeInMainWorld(
+  exposeMain(
     options.name || '__ipcRenderer',
     {
-      invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...encode(args)),
-      send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...encode(args)),
-      sendToHost: (channel: string, ...args: any[]) => ipcRenderer.sendToHost(channel, ...encode(args)),
+      invoke: (channel: string, ...args: any[]) => electron.ipcRenderer.invoke(channel, ...encode(args)),
+      send: (channel: string, ...args: any[]) => electron.ipcRenderer.send(channel, ...encode(args)),
+      sendToHost: (channel: string, ...args: any[]) => electron.ipcRenderer.sendToHost(channel, ...encode(args)),
 
       on: (channel: string, listener: AnyFunction) => {
         const wrapped = wrapListener(listener)
-        ipcRenderer.on(channel, wrapped)
-        return () => ipcRenderer.removeListener(channel, wrapped)
+        electron.ipcRenderer.on(channel, wrapped)
+        return () => electron.ipcRenderer.removeListener(channel, wrapped)
       },
 
       once: (channel: string, listener: AnyFunction) =>
-        ipcRenderer.once(channel, wrapListener(listener)),
+        electron.ipcRenderer.once(channel, wrapListener(listener)),
 
-      postMessage: ipcRenderer.postMessage.bind(ipcRenderer),
-      removeAllListeners: ipcRenderer.removeAllListeners.bind(ipcRenderer),
+      postMessage: electron.ipcRenderer.postMessage.bind(electron.ipcRenderer),
+      removeAllListeners: electron.ipcRenderer.removeAllListeners.bind(electron.ipcRenderer),
     } satisfies TypedIpcRenderer<any>,
   )
 }
