@@ -24,7 +24,7 @@ import electron from 'electron'
  */
 export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T>
 /**
- * Create typesafe `ipcMain`
+ * Create typesafe `ipcMain` on target BrowserWindow
  * @example
  * ```ts
  * import type { IpcSchema } from '../ipc'

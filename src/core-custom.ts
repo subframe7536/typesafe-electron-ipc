@@ -1,4 +1,4 @@
-import type { IpcSchema, TypedIpcMain, TypedIpcRenderer } from './types'
+import type { IpcSchema, TypedIpcMain, TypedIpcMainWithBrowser, TypedIpcRenderer } from './types'
 import type { AnyFunction } from '@subframe7536/type-utils'
 import type { BrowserWindow } from 'electron'
 
@@ -48,7 +48,25 @@ function getSerializer(options: SerializerOptions): { encode: AnyFunction, decod
  * const customMain = useCustomIpcMain<IpcSchema>(options)
  * ```
  */
-export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions): TypedIpcMain<T> {
+export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions): TypedIpcMain<T>
+/**
+ * Create typesafe `ipcMain` with custom serializer on target BrowserWindow
+ * @example
+ * ```ts
+ * import type { SerializerOptions } from 'typesafe-electron-ipc'
+ *
+ * import { app, BrowserWindow } from 'electron'
+ * import { useCustomIpcMain } from 'typesafe-electron-ipc'
+ *
+ * const options: SerializerOptions = {
+ *   serializer: {} // options
+ * }
+ *
+ * const customMain = useCustomIpcMain<IpcSchema>(options, BrowserWindow.getAllWindows()[0])
+ * ```
+ */
+export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions, window: BrowserWindow): TypedIpcMainWithBrowser<T>
+export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions, window?: BrowserWindow): TypedIpcMain<T> | TypedIpcMainWithBrowser<T> {
   const { encode, decode } = getSerializer(options)
 
   const wrapListener = (listener: AnyFunction) =>
@@ -72,12 +90,15 @@ export function useCustomIpcMain<T extends IpcSchema>(options: SerializerOptions
     once: (channel: string, listener: AnyFunction) =>
       electron.ipcMain.once(channel, wrapListener(listener)),
 
-    send: (win: BrowserWindow, channel: string, ...args: any[]) =>
-      win.webContents.send(channel, ...encode(args)),
+    send: window
+      ? (channel: string, ...args: any[]) =>
+          window.webContents.send(channel, ...encode(args))
+      : (win: BrowserWindow, channel: string, ...args: any[]) =>
+          win.webContents.send(channel, ...encode(args)),
 
     removeHandler: electron.ipcMain.removeHandler.bind(electron.ipcMain),
     removeAllListeners: electron.ipcMain.removeAllListeners.bind(electron.ipcMain),
-  } satisfies TypedIpcMain<T>
+  } as TypedIpcMain<T> | TypedIpcMainWithBrowser<T>
 }
 
 /**
