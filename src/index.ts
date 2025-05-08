@@ -3,6 +3,7 @@ export * from './core-custom'
 
 export type {
   IpcSchema,
+  TypedEventEmitter,
   TypedIpcMain,
   TypedIpcMainWithBrowser,
   TypedIpcRenderer,

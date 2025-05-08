@@ -9,7 +9,6 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   fixedExtension: true,
   dts: {
-    resolve: true,
     isolatedDeclarations: true,
   },
   external: ['electron'],

@@ -82,7 +82,7 @@ export function rendererFetch<T = null, P = null>(): RendererFetch<T, P> {
 /**
  * Helper that indicate `ipcMain.on` & `ipcRenderer.send`
  *
- * T is the data that `ipcMain.on` received
+ * `T` is the data that `ipcMain.on` received
  */
 export function rendererSend<T = null>(): RendererSend<T> {
   return SCHEMA_SYMBOL as unknown as RendererSend<T>
@@ -91,7 +91,7 @@ export function rendererSend<T = null>(): RendererSend<T> {
 /**
  * Helper that indicate `ipcMain.send` & `ipcRenderer.on`
  *
- * T is the data that `ipcRenderer.on` received
+ * `T` is the data that `ipcRenderer.on` received
  */
 export function mainSend<T = null>(): MainSend<T> {
   return SCHEMA_SYMBOL as unknown as MainSend<T>
