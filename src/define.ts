@@ -68,14 +68,31 @@ export type DefineIpcSchema<T, Sep extends string = '::'> = IpcSchemaOf<IpcSchem
 
 const SCHEMA_SYMBOL = Symbol()
 
+/**
+ * Helper that indicate `ipcMain.handle` & `ipcRenderer.invoke`
+ *
+ * `T` is the data that `ipcRenderer.invoke` called, `ipcMain.handle` received
+ *
+ * `P` is the data that `ipcRenderer.invoke` returned, `ipcMain.handle` sent
+ */
 export function rendererFetch<T = null, P = null>(): RendererFetch<T, P> {
   return SCHEMA_SYMBOL as unknown as RendererFetch<T, P>
 }
 
+/**
+ * Helper that indicate `ipcMain.on` & `ipcRenderer.send`
+ *
+ * T is the data that `ipcMain.on` received
+ */
 export function rendererSend<T = null>(): RendererSend<T> {
   return SCHEMA_SYMBOL as unknown as RendererSend<T>
 }
 
+/**
+ * Helper that indicate `ipcMain.send` & `ipcRenderer.on`
+ *
+ * T is the data that `ipcRenderer.on` received
+ */
 export function mainSend<T = null>(): MainSend<T> {
   return SCHEMA_SYMBOL as unknown as MainSend<T>
 }
