@@ -1,4 +1,4 @@
-## typesafe electron ipc
+## typesafe-electron-ipc
 
 Typesafe wrapper for IPC in Electron
 
@@ -45,7 +45,7 @@ export const MSG = defineIpcSchema({
 export type IpcSchema = IpcSchemaOf<typeof MSG>
 ```
 
-Or you can define type-only schema
+Or you can define type-only schema (Not recommend for debugging)
 ```ts
 import type { DefineIpcSchema, MainSend, RendererFetch, RendererSend } from 'typesafe-electron-ipc/define'
 
@@ -103,7 +103,7 @@ const clearHandler = main.handle('another', (_, data) => {
 clearHandler() // clear handler
 ```
 
-#### In preload
+#### In Preload
 
 ```ts
 import { exposeIpcRenderer } from 'typesafe-electron-ipc'
@@ -111,7 +111,7 @@ import { exposeIpcRenderer } from 'typesafe-electron-ipc'
 exposeIpcRenderer()
 ```
 
-#### In renderer
+#### In Renderer Process
 
 ```ts
 import type { IpcSchema } from '../ipc'
@@ -156,6 +156,9 @@ const customMain = useCustomIpcMain<IpcSchema>(options)
 
 // preload
 exposeCustomIpcRenderer(options)
+
+// renderer
+useIpcRenderer<IpcSchema>()
 ```
 
 ## Typesafe EventEmitter (Deprecated)
