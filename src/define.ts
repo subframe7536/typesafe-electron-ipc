@@ -1,8 +1,8 @@
 /* eslint-disable symbol-description */
 import type { IpcFn, MainSend, RendererFetch, RendererSend } from './types'
 import type {
-  DrainOuterGeneric,
   IsEmptyObject,
+  Prettify,
   RemoveNeverProps,
   UnionToIntersection,
 } from '@subframe7536/type-utils'
@@ -18,13 +18,13 @@ type SchemaKey<T extends string, P extends IpcFn> = T & { '~ipc': P }
 /**
  * Convert `{ a: { b: MainSend<string> } }` to `{ a: { b: 'a::b' & { '~ipc': MainSend<string>} } }`
  */
-type ChannelMap<T, Sep extends string, Path extends string = ''> = DrainOuterGeneric<FilterEmptyProps<{
+type ChannelMap<T, Sep extends string, Path extends string = ''> = FilterEmptyProps<{
   [K in keyof T]: T[K] extends IpcFn
     ? SchemaKey<`${Path}${Path extends '' ? '' : Sep}${K & string}`, T[K]>
     : T[K] extends Record<string, unknown>
       ? ChannelMap<T[K], Sep, `${Path}${Path extends '' ? '' : Sep}${K & string}`>
       : never
-}>>
+}>
 
 type ExtractIpcValues<T> = T extends SchemaKey<infer S, infer V>
   ? { [Key in S & string]: V }
@@ -39,7 +39,7 @@ type RemoveSchemaKey<T> = T extends SchemaKey<infer S, any>
     : never
 
 type IpcSchemaResult<T, Sep extends string> = ChannelMap<T, Sep> extends infer S
-  ? RemoveSchemaKey<S> & { readonly '~ipc': UnionToIntersection<ExtractIpcValues<S>> }
+  ? RemoveSchemaKey<S> & { readonly '~ipc': Prettify<UnionToIntersection<ExtractIpcValues<S>>> }
   : never
 
 export type IpcSchemaOf<T> = T extends { ['~ipc']?: infer S } ? S : never
