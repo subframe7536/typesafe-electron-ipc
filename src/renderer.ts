@@ -8,7 +8,7 @@ import type { IpcSchema, TypedIpcRenderer } from './types'
 export function useIpcRenderer<T extends IpcSchema>(
   name = '__ipcRenderer',
 ): TypedIpcRenderer<T> {
-  return globalThis[name]
+  return useElectron(name)
 }
 
 export function useElectron<T>(key: string): T {

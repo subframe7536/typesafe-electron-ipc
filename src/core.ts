@@ -43,23 +43,24 @@ export function useIpcMain<T extends IpcSchema>(): TypedIpcMain<T>
  */
 export function useIpcMain<T extends IpcSchema>(window: BrowserWindow): TypedIpcMainWithBrowser<T>
 export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIpcMain<T> | TypedIpcMainWithBrowser<T> {
+  const ipc = electron.ipcMain
   return {
     send: window
       ? window.webContents.send.bind(window.webContents)
       : (win: BrowserWindow, channel: string, ...args: any[]) =>
           win.webContents.send(channel, ...args),
-    handleOnce: electron.ipcMain.handleOnce.bind(electron.ipcMain),
+    handleOnce: ipc.handleOnce.bind(ipc),
     handle: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.handle(channel, listener)
-      return () => electron.ipcMain.removeHandler(channel)
+      ipc.handle(channel, listener)
+      return () => ipc.removeHandler(channel)
     },
     on: (channel: string, listener: AnyFunction) => {
-      electron.ipcMain.on(channel, listener)
-      return () => electron.ipcMain.removeListener(channel, listener)
+      ipc.on(channel, listener)
+      return () => ipc.removeListener(channel, listener)
     },
-    once: electron.ipcMain.once.bind(electron.ipcMain),
-    removeHandler: electron.ipcMain.removeHandler.bind(electron.ipcMain),
-    removeAllListeners: electron.ipcMain.removeAllListeners.bind(electron.ipcMain),
+    once: ipc.once.bind(ipc),
+    removeHandler: ipc.removeHandler.bind(ipc),
+    removeAllListeners: ipc.removeAllListeners.bind(ipc),
   } as TypedIpcMain<T> | TypedIpcMainWithBrowser<T>
 }
 /**
@@ -73,19 +74,20 @@ export function useIpcMain<T extends IpcSchema>(window?: BrowserWindow): TypedIp
  * ```
  */
 export function exposeIpcRenderer(name = '__ipcRenderer'): void {
+  const ipc = electron.ipcRenderer
   exposeMain(
     name,
     {
-      invoke: electron.ipcRenderer.invoke.bind(electron.ipcRenderer),
-      send: electron.ipcRenderer.send.bind(electron.ipcRenderer),
-      sendToHost: electron.ipcRenderer.sendToHost.bind(electron.ipcRenderer),
+      invoke: ipc.invoke.bind(ipc),
+      send: ipc.send.bind(ipc),
+      sendToHost: ipc.sendToHost.bind(ipc),
       on: (channel: string, listener: AnyFunction) => {
-        electron.ipcRenderer.on(channel, listener)
-        return () => electron.ipcRenderer.removeListener(channel, listener)
+        ipc.on(channel, listener)
+        return () => ipc.removeListener(channel, listener)
       },
-      once: electron.ipcRenderer.once.bind(electron.ipcRenderer),
-      postMessage: electron.ipcRenderer.postMessage.bind(electron.ipcRenderer),
-      removeAllListeners: electron.ipcRenderer.removeAllListeners.bind(electron.ipcRenderer),
+      once: ipc.once.bind(ipc),
+      postMessage: ipc.postMessage.bind(ipc),
+      removeAllListeners: ipc.removeAllListeners.bind(ipc),
     } satisfies TypedIpcRenderer<any>,
   )
 }
